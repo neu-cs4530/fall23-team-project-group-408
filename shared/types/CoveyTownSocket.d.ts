@@ -223,3 +223,43 @@ export interface ClientToServerEvents {
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
 }
+
+/**
+ * Type for the state of a TicTacToe game
+ * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
+ * The first player to join the game is x, the second is o
+ */
+export interface DrawThePerfectShapeGameState extends WinnableGameState {
+  player1?: PlayerID;
+  player2?: PlayerID;
+  trace_shape?: DrawThePerfectShapeShape;
+  player1_shape?: DrawThePerfectShapeShape;
+  player2_shape?: DrawThePerfectShapeShape;
+
+}
+
+/**
+ * Each move 
+ */
+export interface DrawThePerfectShapeMove {
+  player: DrawThePerfectShapePlayer;
+  pixel_x: DrawThePerfectShapePixel;
+  pixel_y: DrawThePerfectShapePixel;
+}
+
+export type DrawThePerfectShapePlayer = 1 | 2; 
+
+export type DrawThePerfectShapePixel = number;
+
+
+export interface DrawThePerfectShapeShape {
+  titleDifficulty: DrawThePerfectShapeTitleDifficulty;
+  pixels: DrawThePerfectShapePixel[];
+}
+
+export type DrawThePerfectShapeDifficulty = 'Easy' | 'Medium' | 'Hard';
+
+export type DrawThePerfectShapeTitleDifficulty = 
+{'Circle','Easy'} | {'Square','Easy'} | {'Star','Easy'} | 
+{'Umbrella','Medium'} | {'House','Medium'} | {'Christmas Tree','Medium'} | 
+{'Helicopter','Hard'} | {'Car','Hard'} | {'Husky','Hard'};
