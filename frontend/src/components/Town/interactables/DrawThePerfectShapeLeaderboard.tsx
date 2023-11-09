@@ -15,10 +15,14 @@ import { DrawThePerefectShapeGameResult } from '../../../types/CoveyTownSocket';
  *
  * @returns
  */
-export default function DrawThePerfectShapeLeaderboard({ results }: { results: DrawThePerefectShapeGameResult[] }): JSX.Element {
+export default function DrawThePerfectShapeLeaderboard({
+  results,
+}: {
+  results: DrawThePerefectShapeGameResult[];
+}): JSX.Element {
   const winsLossesTiesByPlayer: Record<
     string,
-    { player: string; wins: number; losses: number; accuracy: number}
+    { player: string; wins: number; losses: number; accuracy: number }
   > = {};
   results.forEach(result => {
     const players = Object.keys(result.scores);
