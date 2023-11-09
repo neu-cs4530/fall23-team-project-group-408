@@ -54,12 +54,12 @@ export default class DrawThePerfectShapeGame extends Game<
     }
     if (this.state.player1 && this.state.player2) {
       this.state = {
-        ...this.state
+        ...this.state,
       };
     }
   }
 
-   /**
+  /**
    * Removes a player from the game.
    * Updates the game's state to reflect the player leaving.
    * If the game has two players in it at the time of call to this method,
