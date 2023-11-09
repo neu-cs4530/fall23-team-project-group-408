@@ -235,7 +235,7 @@ export interface DrawThePerfectShapeGameState extends WinnableGameState {
   trace_shape?: DrawThePerfectShapeShape;
   player1_shape?: DrawThePerfectShapeShape;
   player2_shape?: DrawThePerfectShapeShape;
-
+  
 }
 
 /**
