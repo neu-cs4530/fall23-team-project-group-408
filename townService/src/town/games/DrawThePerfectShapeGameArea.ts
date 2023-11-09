@@ -6,6 +6,9 @@ import {
 } from '../../types/CoveyTownSocket';
 import GameArea from './GameArea';
 
+/**
+ * Dummy comment
+ */
 export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfectShapeGame> {
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,

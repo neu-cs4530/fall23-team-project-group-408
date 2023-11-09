@@ -130,6 +130,12 @@ export interface GameResult {
   scores: { [playerName: string]: number };
 }
 
+export interface DrawThePerefectShapeGameResult {
+  gameID: GameInstanceID;
+  scores: { [playerName: string]: number };
+  accuracy: { [playerName: string]: number };
+}
+
 /**
  * Base type for an *instance* of a game. An instance of a game
  * consists of the present state of the game (which can change over time),
