@@ -22,9 +22,13 @@ const Canvas = ({ width = window.innerWidth, height = window.innerHeight }: Canv
     }
 
     const canvas: HTMLCanvasElement = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
     const coord: Coordinate = {
-      x: event.pageX - canvas.offsetLeft,
-      y: event.pageY - canvas.offsetTop,
+      x: (event.clientX - rect.left) * scaleX,
+      y: (event.clientY - rect.top) * scaleY,
     };
     return coord;
   };
@@ -46,7 +50,7 @@ const Canvas = ({ width = window.innerWidth, height = window.innerHeight }: Canv
     if (context) {
       context.strokeStyle = 'red';
       context.lineJoin = 'round';
-      context.lineWidth = 5;
+      context.lineWidth = 10;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -97,7 +101,9 @@ const Canvas = ({ width = window.innerWidth, height = window.innerHeight }: Canv
     };
   }, [startPaint, paint, exitPaint]);
 
-  return <canvas ref={canvasRef} height={height} width={width} />;
+  return (
+    <canvas ref={canvasRef} height={height} width={width} style={{ border: '1px solid #000' }} />
+  );
 };
 
 Canvas.defaultProps = {
