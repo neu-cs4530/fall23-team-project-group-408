@@ -255,17 +255,25 @@ export interface DrawThePerfectShapeMove {
 
 export type DrawThePerfectShapePlayer = 1 | 2; 
 
-export type DrawThePerfectShapePixel = number;
-
+export interface DrawThePerfectShapePixel {
+  x: number;
+  y: number;
+}
 
 export interface DrawThePerfectShapeShape {
-  titleDifficulty: DrawThePerfectShapeTitleDifficulty;
+  title: DrawThePerfectShapeTitle;
+  difficulty: DrawThePerfectShapeDifficulty;
   pixels: DrawThePerfectShapePixel[];
+
+
+  addPixels: (pixels: DrawThePerfectShapePixel[]) => void;
+  accuracy: (otherShape: DrawThePerfectShapeShape) => number;
 }
 
 export type DrawThePerfectShapeDifficulty = 'Easy' | 'Medium' | 'Hard';
 
-export type DrawThePerfectShapeTitleDifficulty = 
-{'Circle','Easy'} | {'Square','Easy'} | {'Star','Easy'} | 
-{'Umbrella','Medium'} | {'House','Medium'} | {'Christmas Tree','Medium'} | 
-{'Helicopter','Hard'} | {'Car','Hard'} | {'Husky','Hard'};
+export type DrawThePerfectShapeTitle = 'Circle' | 'Square' | 'Star' | 'Umbrella' | 'House' | 
+'Christmas Tree' | 'Helicopter' | 'Car' | 'Husky';
+
+
+
