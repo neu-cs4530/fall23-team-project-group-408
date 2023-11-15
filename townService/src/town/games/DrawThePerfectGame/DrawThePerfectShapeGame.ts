@@ -1,15 +1,15 @@
-import Game from './Game';
-import Player from '../../lib/Player';
+import Game from '../Game';
+import Player from '../../../lib/Player';
 import {
   DrawThePerfectShapeGameState,
   DrawThePerfectShapeMove,
   GameMove,
-} from '../../types/CoveyTownSocket';
+} from '../../../types/CoveyTownSocket';
 import InvalidParametersError, {
   GAME_FULL_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
-} from '../../lib/InvalidParametersError';
+} from '../../../lib/InvalidParametersError';
 
 export default class DrawThePerfectShapeGame extends Game<
   DrawThePerfectShapeGameState,
