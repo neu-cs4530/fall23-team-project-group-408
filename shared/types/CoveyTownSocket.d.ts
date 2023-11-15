@@ -244,13 +244,9 @@ export interface DrawThePerfectShapeGameState extends WinnableGameState {
   
 }
 
-/**
- * Each move 
- */
 export interface DrawThePerfectShapeMove {
   player: DrawThePerfectShapePlayer;
-  pixel_x: DrawThePerfectShapePixel;
-  pixel_y: DrawThePerfectShapePixel;
+  pixels: DrawThePerfectShapePixel[];
 }
 
 export type DrawThePerfectShapePlayer = 1 | 2; 
@@ -264,8 +260,6 @@ export interface DrawThePerfectShapeShape {
   title: DrawThePerfectShapeTitle;
   difficulty: DrawThePerfectShapeDifficulty;
   pixels: DrawThePerfectShapePixel[];
-
-
   addPixels: (pixels: DrawThePerfectShapePixel[]) => void;
   accuracy: (otherShape: DrawThePerfectShapeShape) => number;
 }
