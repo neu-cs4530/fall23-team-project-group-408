@@ -180,13 +180,18 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | GameMoveCommand<DrawThePerfectMove>;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | PickDifficultyGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | GameMoveCommand<DrawThePerfectMove>;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
+}
+export interface PickDifficultyGameCommand {
+  type: "PickDifficulty";
+  gameID: GameInstanceID;
+  gameDifficulty: DrawThePerfectShapeDifficulty;
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
@@ -199,6 +204,7 @@ export interface GameMoveCommand<MoveType> {
 }
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
+  CommandType extends PickDifficultyGameCommand ? undefined:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :

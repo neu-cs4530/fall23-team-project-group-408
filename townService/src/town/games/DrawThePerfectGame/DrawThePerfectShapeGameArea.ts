@@ -5,7 +5,10 @@ import InvalidParametersError, {
 } from '../../../lib/InvalidParametersError';
 import Player from '../../../lib/Player';
 import {
+  DrawThePerfectShapeDifficulty,
   DrawThePerfectShapeGameState,
+  DrawThePerfectShapePixel,
+  DrawThePerfectShapeTitle,
   GameInstance,
   InteractableCommand,
   InteractableCommandReturnType,
@@ -13,6 +16,7 @@ import {
 } from '../../../types/CoveyTownSocket';
 import DrawThePerfectShapeGame from './DrawThePerfectShapeGame';
 import GameArea from '../GameArea';
+import Shape from './Shapes/Shape';
 
 /**
  * Dummy comment
@@ -73,6 +77,18 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === "PickDifficulty") {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      this.handleDifficulty(command.gameDifficulty)
+      this._stateUpdated(game.toModel());
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     if (command.type === 'LeaveGame') {
       const game = this._game;
       if (!game) {
@@ -90,5 +106,40 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
 
   protected getType(): InteractableType {
     return 'DrawThePerfectShapeArea';
+  }
+
+  private handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
+    let difficulties: DrawThePerfectShapeTitle[] = [];
+    if (gameDifficulty === 'Easy') {
+      difficulties = ['Circle', 'Square' , 'Star']
+    }
+    if (gameDifficulty === 'Medium') {
+      difficulties = ['Umbrella', 'House', 'Christmas Tree']
+    }
+    if (gameDifficulty === 'Hard') {
+      difficulties = ['Helicopter', 'Car', 'Husky']
+    }
+    if (difficulties.length > 0) {
+      const randomShape = this.getRandomShape(difficulties);
+      const traceShapePixels = this.getTraceShapePixels(randomShape);
+      const traceDrawThePerfectShapeShape = new Shape(
+        randomShape,
+        gameDifficulty,
+        traceShapePixels
+      )
+      if (this.game && this.game.state) {
+        this.game.state.trace_shape = traceDrawThePerfectShapeShape;
+      }
+    }
+  }
+
+  private getRandomShape(shapes: DrawThePerfectShapeTitle[]): DrawThePerfectShapeTitle {
+    return shapes[Math.floor(Math.random() * shapes.length)];
+  }
+
+  private getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
+    // Need to change for all different pictures
+    const pixels: DrawThePerfectShapePixel[] = [];
+    return pixels;
   }
 }

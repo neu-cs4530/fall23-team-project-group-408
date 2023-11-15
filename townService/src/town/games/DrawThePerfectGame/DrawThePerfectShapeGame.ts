@@ -50,7 +50,11 @@ export default class DrawThePerfectShapeGame extends Game<
         player2: player.id,
       };
     } else {
-      throw new InvalidParametersError(GAME_FULL_MESSAGE);
+      // throw new InvalidParametersError(GAME_FULL_MESSAGE);
+      const newPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
+      if (newPlayer !== undefined) {
+        throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+      }
     }
     if (this.state.player1 && this.state.player2) {
       this.state = {
@@ -71,7 +75,8 @@ export default class DrawThePerfectShapeGame extends Game<
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
   protected _leave(player: Player): void {
-    if (this.state.player1 !== player.id && this.state.player2 !== player.id) {
+    const findPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
+    if (this.state.player1 !== player.id && this.state.player2 !== player.id && findPlayer?.id !== player.id) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     // Handles case where the game has not started yet
