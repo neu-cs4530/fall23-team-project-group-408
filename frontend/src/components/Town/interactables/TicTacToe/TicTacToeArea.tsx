@@ -27,6 +27,9 @@ import GameAreaInteractable from '../GameArea';
 import TicTacToeLeaderboard from '../Leaderboard';
 import TicTacToeBoard from './TicTacToeBoard';
 
+import DrawThePerfectShapeArea from '../DrawThePerfectShape/DrawThePerfectShapeArea';
+import { styled } from '@material-ui/core/styles';
+
 /**
  * The TicTacToeArea component renders the TicTacToe game area.
  * It renders the current state of the area, optionally allowing the player to join the game.
@@ -219,12 +222,13 @@ export default function TicTacToeAreaWrapper(): JSX.Element {
 
   if (gameArea && gameArea.getData('type') === 'TicTacToe') {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='5xl'>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{gameArea.name}</ModalHeader>
+        <ModalContent style={{ width: '962px' }}>
+          {/* <ModalHeader>{gameArea.name}</ModalHeader> */}
+          <ModalHeader>{'Draw The Perfect Shape!'}</ModalHeader>
           <ModalCloseButton />
-          <TicTacToeArea interactableID={gameArea.name} />;
+          <DrawThePerfectShapeArea interactableID={gameArea.id} />
         </ModalContent>
       </Modal>
     );
