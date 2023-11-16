@@ -1,11 +1,13 @@
-import { Box, Button, Container, Flex, HStack, Spacer, VStack } from '@chakra-ui/react';
+import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/react';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
-import React, { useEffect, useState } from 'react';
-
-import Canvas from '../Canvas';
-import { useInteractableAreaController } from '../../../../classes/TownController';
+import React, { useCallback, useEffect, useState } from 'react';
+import GameAreaInteractable from '../GameArea';
+import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
 import TicTacToeAreaController from '../../../../classes/interactable/TicTacToeAreaController';
-export default function DrawThePerfectShapeArea({
+import useTownController from '../../../../hooks/useTownController';
+import Canvas from './Canvas';
+
+function DrawThePerfectShapeArea({
   interactableID,
 }: {
   interactableID: InteractableID;
@@ -87,4 +89,30 @@ export default function DrawThePerfectShapeArea({
     </div>
   );
   return page;
+}
+
+export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
+  const gameArea = useInteractable<GameAreaInteractable>('gameArea');
+  const townController = useTownController();
+  const closeModal = useCallback(() => {
+    if (gameArea) {
+      townController.interactEnd(gameArea);
+      const controller = townController.getGameAreaController(gameArea);
+      controller.leaveGame();
+    }
+  }, [townController, gameArea]);
+
+  if (gameArea && gameArea.getData('type') === 'DrawThePerfectShape') {
+    return (
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{gameArea.name}</ModalHeader>
+          <ModalCloseButton />
+          <DrawThePerfectShapeArea interactableID={gameArea.name} />;
+        </ModalContent>
+      </Modal>
+    );
+  }
+  return <></>;
 }

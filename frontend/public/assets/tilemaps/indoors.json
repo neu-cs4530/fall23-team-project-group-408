@@ -614,6 +614,12 @@
                  "height":91.3789920620269,
                  "id":52,
                  "name":"Draw The Perfect Shape 1",
+                 "properties":[
+                     {
+                      "name":"type",
+                      "type":"string",
+                      "value":"DrawThePerfectShape"
+                     }],
                  "rotation":0,
                  "type":"GameArea",
                  "visible":true,
