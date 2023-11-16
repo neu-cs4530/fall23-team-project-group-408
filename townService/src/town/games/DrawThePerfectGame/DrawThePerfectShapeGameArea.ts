@@ -1,3 +1,4 @@
+import db from '../../../../firebaseInit';
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_ID_MISSMATCH_MESSAGE,
@@ -5,6 +6,7 @@ import InvalidParametersError, {
 } from '../../../lib/InvalidParametersError';
 import Player from '../../../lib/Player';
 import {
+  DrawThePerefectShapeGameResult,
   DrawThePerfectShapeGameState,
   GameInstance,
   InteractableCommand,
@@ -90,5 +92,15 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
 
   protected getType(): InteractableType {
     return 'DrawThePerfectShapeArea';
+  }
+
+  protected submitScore(result: DrawThePerefectShapeGameResult) {
+    if (result.gameID) {
+      db.collection('scores').add({
+        gameID: result.gameID,
+        score: result.scores,
+        accuracy: result.accuracy,
+      });
+    }
   }
 }
