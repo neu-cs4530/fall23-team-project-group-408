@@ -9,6 +9,7 @@ import InvalidParametersError, {
   GAME_FULL_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
+  SHAPE_DOES_NOT_EXISTS,
 } from '../../../lib/InvalidParametersError';
 
 export default class DrawThePerfectShapeGame extends Game<
@@ -18,11 +19,38 @@ export default class DrawThePerfectShapeGame extends Game<
   public constructor() {
     super({
       status: 'WAITING_TO_START',
+      difficulty: 'Easy',
+      timer: 10,
+      start_time: 0,
     });
   }
 
   public applyMove(move: GameMove<DrawThePerfectShapeMove>): void {
-    throw new Error('Method not implemented.');
+    if (move.playerID === this.state.player1) {
+      this.state.player1_shape?.addPixels(move.move.pixels)
+    }
+    if (move.playerID === this.state.player2) {
+      this.state.player2_shape?.addPixels(move.move.pixels)
+    }
+    this.handleGameEnding();
+  }
+
+  private handleGameEnding(): void {
+    const currentTimeNow = Date.now() / 1000;
+    if (!this.state.player1_shape || !this.state.player2_shape) {
+      throw new InvalidParametersError(SHAPE_DOES_NOT_EXISTS);
+    }
+    if ((currentTimeNow - this.state.start_time) > this.state.timer) {
+      this.state.status = 'OVER';
+      const player1Accuracy = this.state.player1_shape?.accuracy(this.state.player1_shape);
+      const player2Accuracy = this.state.player2_shape?.accuracy(this.state.player2_shape);
+      if (player1Accuracy > player2Accuracy) {
+        this.state.winner = this.state.player1;
+    
+      } else {
+        this.state.winner = this.state.player2;
+      }
+    }
   }
 
   /**
@@ -85,6 +113,9 @@ export default class DrawThePerfectShapeGame extends Game<
         trace_shape: undefined,
         player1_shape: undefined,
         player2_shape: undefined,
+        difficulty: 'Easy',
+        timer: 10,
+        start_time: 0,
         status: 'WAITING_TO_START',
       };
       return;

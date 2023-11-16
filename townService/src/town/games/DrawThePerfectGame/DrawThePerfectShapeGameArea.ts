@@ -7,6 +7,7 @@ import Player from '../../../lib/Player';
 import {
   DrawThePerfectShapeDifficulty,
   DrawThePerfectShapeGameState,
+  DrawThePerfectShapeMove,
   DrawThePerfectShapePixel,
   DrawThePerfectShapeTitle,
   GameInstance,
@@ -50,58 +51,95 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    if (command.type === 'GameMove') {
-      const game = this._game;
-      if (!game) {
-        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    switch(command.type) {
+      case 'GameMove': {
+        this.handleGameMove(player, command.gameID, command.move);
+        return undefined as InteractableCommandReturnType<CommandType>;
       }
-      if (this._game?.id !== command.gameID) {
-        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      case 'JoinGame': {
+        return this.handleJoinCommand(player) as InteractableCommandReturnType<CommandType>;
       }
-      game.applyMove({
-        move: command.move,
-        playerID: player.id,
-        gameID: command.gameID,
-      });
-      this._stateUpdated(game.toModel());
-      return undefined as InteractableCommandReturnType<CommandType>;
+      case 'PickDifficulty': {
+        this.handlePickDifficulty(command.gameID, command.gameDifficulty);
+        return undefined as InteractableCommandReturnType<CommandType>;
+      }
+      case 'StartGame': {
+        this.handleStartGame(command.gameID);
+        return undefined as InteractableCommandReturnType<CommandType>;
+      }
+      case 'LeaveGame': {
+        this.handleLeaveGame(player, command.gameID);
+        return undefined as InteractableCommandReturnType<CommandType>;
+      }
+      default: {
+        throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+      }
     }
-    if (command.type === 'JoinGame') {
-      let game = this._game;
-      if (!game || game.state.status === 'OVER') {
-        // No game in progress, make a new one
-        game = new DrawThePerfectShapeGame();
-        this._game = game;
-      }
-      game.join(player);
-      this._stateUpdated(game.toModel());
-      return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
+  }
+
+  private handleJoinCommand(player: Player): {gameID: string} {
+    let game = this._game;
+    if (!game || game.state.status === 'OVER') {
+      // No game in progress, make a new one
+      game = new DrawThePerfectShapeGame();
+      this._game = game;
     }
-    if (command.type === "PickDifficulty") {
-      const game = this._game;
-      if (!game) {
-        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-      }
-      if (this._game?.id !== command.gameID) {
-        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
-      }
-      this.handleDifficulty(command.gameDifficulty)
-      this._stateUpdated(game.toModel());
-      return undefined as InteractableCommandReturnType<CommandType>;
+    game.join(player);
+    this._stateUpdated(game.toModel());
+    return { gameID: game.id };
+  }
+
+  private handleGameMove(player: Player, gameID: string, move: DrawThePerfectShapeMove): void {
+    const game = this._game;
+    if (!game) {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
-    if (command.type === 'LeaveGame') {
-      const game = this._game;
-      if (!game) {
-        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-      }
-      if (this._game?.id !== command.gameID) {
-        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
-      }
-      game.leave(player);
-      this._stateUpdated(game.toModel());
-      return undefined as InteractableCommandReturnType<CommandType>;
+    if (this._game?.id !== gameID) {
+      throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+    game.applyMove({
+      move: move,
+      playerID: player.id,
+      gameID: gameID,
+    });
+    this._stateUpdated(game.toModel());
+  }
+
+  private handlePickDifficulty(gameID: string, gameDifficulty: DrawThePerfectShapeDifficulty): void {
+    const game = this._game;
+    if (!game) {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    }
+    if (this._game?.id !== gameID) {
+      throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+    }
+    this.handleDifficulty(gameDifficulty);
+    game.state.difficulty = gameDifficulty;
+    this._stateUpdated(game.toModel());
+  }
+
+  private handleStartGame(gameID: string): void {
+    const game = this._game;
+    if (!game) {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    }
+    if (this._game?.id !== gameID) {
+      throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+    }
+    game.state.start_time = Date.now() / 1000;
+    this._stateUpdated(game.toModel())
+  }
+
+  private handleLeaveGame(player: Player, gameID: string): void {
+    const game = this._game;
+    if (!game) {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    } 
+    if (this._game?.id !== gameID) {
+      throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+    }
+    game.leave(player);
+    this._stateUpdated(game.toModel());
   }
 
   protected getType(): InteractableType {
@@ -110,14 +148,20 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
 
   private handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
     let difficulties: DrawThePerfectShapeTitle[] = [];
+    if (!this.game || !this.game.state) {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE)
+    }
     if (gameDifficulty === 'Easy') {
-      difficulties = ['Circle', 'Square' , 'Star']
+      difficulties = ['Circle', 'Square' , 'Star'];
+      this.game.state.timer = 10;
     }
     if (gameDifficulty === 'Medium') {
-      difficulties = ['Umbrella', 'House', 'Christmas Tree']
+      difficulties = ['Umbrella', 'House', 'Christmas Tree'];
+      this.game.state.timer = 15;
     }
     if (gameDifficulty === 'Hard') {
-      difficulties = ['Helicopter', 'Car', 'Husky']
+      difficulties = ['Helicopter', 'Car', 'Husky'];
+      this.game.state.timer = 20;
     }
     if (difficulties.length > 0) {
       const randomShape = this.getRandomShape(difficulties);
@@ -133,11 +177,9 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
         gameDifficulty,
         emptyShapePixels
       )
-      if (this.game && this.game.state) {
-        this.game.state.trace_shape = traceDrawThePerfectShapeShape;
-        this.game.state.player1_shape = playerDrawThePerfectShapeShape;
-        this.game.state.player2_shape = playerDrawThePerfectShapeShape;
-      }
+      this.game.state.trace_shape = traceDrawThePerfectShapeShape;
+      this.game.state.player1_shape = playerDrawThePerfectShapeShape;
+      this.game.state.player2_shape = playerDrawThePerfectShapeShape;
     }
   }
 

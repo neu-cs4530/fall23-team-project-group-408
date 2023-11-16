@@ -180,7 +180,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | PickDifficultyGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | GameMoveCommand<DrawThePerfectMove>;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | PickDifficultyGameCommand | StartGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | GameMoveCommand<DrawThePerfectMove>;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -189,9 +189,13 @@ export interface JoinGameCommand {
   type: 'JoinGame';
 }
 export interface PickDifficultyGameCommand {
-  type: "PickDifficulty";
+  type: 'PickDifficulty';
   gameID: GameInstanceID;
   gameDifficulty: DrawThePerfectShapeDifficulty;
+}
+export interface StartGameCommand {
+  type: 'StartGame';
+  gameID: GameInstanceID,
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
@@ -205,6 +209,7 @@ export interface GameMoveCommand<MoveType> {
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends PickDifficultyGameCommand ? undefined:
+  CommandType extends StartGameCommand ? undefined:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
@@ -245,6 +250,9 @@ export interface DrawThePerfectShapeGameState extends WinnableGameState {
   player1?: PlayerID;
   player2?: PlayerID;
   trace_shape?: DrawThePerfectShapeShape;
+  timer: number;
+  start_time: number;
+  difficulty: DrawThePerfectShapeDifficulty;
   player1_shape?: DrawThePerfectShapeShape;
   player2_shape?: DrawThePerfectShapeShape;
   
@@ -274,6 +282,8 @@ export type DrawThePerfectShapeDifficulty = 'Easy' | 'Medium' | 'Hard';
 
 export type DrawThePerfectShapeTitle = 'Circle' | 'Square' | 'Star' | 'Umbrella' | 'House' | 
 'Christmas Tree' | 'Helicopter' | 'Car' | 'Husky';
+
+
 
 
 
