@@ -1,4 +1,4 @@
-// Your web app's Firebase configuration -- dummy comment
+// Your web app's Firebase configuration
 export default {
     apiKey: "AIzaSyBWKDj-qfejNaK1ArNOgVZW0VIglkjP3v0",
     authDomain: "covey-town-drawing-scores.firebaseapp.com",
