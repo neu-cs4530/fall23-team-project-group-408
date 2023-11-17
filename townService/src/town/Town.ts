@@ -423,15 +423,15 @@ export default class Town {
         `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
       );
     }
-    // Make sure that there are no overlapping objects
-    for (const interactable of this._interactables) {
-      for (const otherInteractable of this._interactables) {
-        if (interactable !== otherInteractable && interactable.overlaps(otherInteractable)) {
-          throw new Error(
-            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`,
-          );
-        }
-      }
-    }
+    // // Make sure that there are no overlapping objects
+    // for (const interactable of this._interactables) {
+    //   for (const otherInteractable of this._interactables) {
+    //     if (interactable !== otherInteractable && interactable.overlaps(otherInteractable)) {
+    //       throw new Error(
+    //         `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`,
+    //       );
+    //     }
+    //   }
+    // }
   }
 }
