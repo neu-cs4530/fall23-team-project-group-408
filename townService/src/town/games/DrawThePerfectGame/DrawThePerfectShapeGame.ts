@@ -6,7 +6,6 @@ import {
   GameMove,
 } from '../../../types/CoveyTownSocket';
 import InvalidParametersError, {
-  GAME_FULL_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
   SHAPE_DOES_NOT_EXISTS,
@@ -27,26 +26,25 @@ export default class DrawThePerfectShapeGame extends Game<
 
   public applyMove(move: GameMove<DrawThePerfectShapeMove>): void {
     if (move.playerID === this.state.player1) {
-      this.state.player1_shape?.addPixels(move.move.pixels)
+      this.state.player1_shape?.addPixels(move.move.pixels);
     }
     if (move.playerID === this.state.player2) {
-      this.state.player2_shape?.addPixels(move.move.pixels)
+      this.state.player2_shape?.addPixels(move.move.pixels);
     }
-    this.handleGameEnding();
+    this._handleGameEnding();
   }
 
-  private handleGameEnding(): void {
+  private _handleGameEnding(): void {
     const currentTimeNow = Date.now() / 1000;
     if (!this.state.player1_shape || !this.state.player2_shape) {
       throw new InvalidParametersError(SHAPE_DOES_NOT_EXISTS);
     }
-    if ((currentTimeNow - this.state.start_time) > this.state.timer) {
+    if (currentTimeNow - this.state.start_time > this.state.timer) {
       this.state.status = 'OVER';
       const player1Accuracy = this.state.player1_shape?.accuracy(this.state.player1_shape);
       const player2Accuracy = this.state.player2_shape?.accuracy(this.state.player2_shape);
       if (player1Accuracy > player2Accuracy) {
         this.state.winner = this.state.player1;
-    
       } else {
         this.state.winner = this.state.player2;
       }
@@ -104,7 +102,11 @@ export default class DrawThePerfectShapeGame extends Game<
    */
   protected _leave(player: Player): void {
     const findPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
-    if (this.state.player1 !== player.id && this.state.player2 !== player.id && findPlayer?.id !== player.id) {
+    if (
+      this.state.player1 !== player.id &&
+      this.state.player2 !== player.id &&
+      findPlayer?.id !== player.id
+    ) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     // Handles case where the game has not started yet

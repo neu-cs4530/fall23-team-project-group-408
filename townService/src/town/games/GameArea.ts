@@ -19,8 +19,6 @@ export default abstract class GameArea<
 
   protected _history: GameResult[] = [];
 
-  
-
   public get game(): GameType | undefined {
     return this._game;
   }

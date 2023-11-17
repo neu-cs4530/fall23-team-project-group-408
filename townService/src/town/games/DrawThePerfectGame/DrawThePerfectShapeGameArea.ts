@@ -51,24 +51,24 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    switch(command.type) {
+    switch (command.type) {
       case 'GameMove': {
-        this.handleGameMove(player, command.gameID, command.move);
+        this._handleGameMove(player, command.gameID, command.move);
         return undefined as InteractableCommandReturnType<CommandType>;
       }
       case 'JoinGame': {
-        return this.handleJoinCommand(player) as InteractableCommandReturnType<CommandType>;
+        return this._handleJoinCommand(player) as InteractableCommandReturnType<CommandType>;
       }
       case 'PickDifficulty': {
-        this.handlePickDifficulty(command.gameID, command.gameDifficulty);
+        this._handlePickDifficulty(command.gameID, command.gameDifficulty);
         return undefined as InteractableCommandReturnType<CommandType>;
       }
       case 'StartGame': {
-        this.handleStartGame(command.gameID);
+        this._handleStartGame(command.gameID);
         return undefined as InteractableCommandReturnType<CommandType>;
       }
       case 'LeaveGame': {
-        this.handleLeaveGame(player, command.gameID);
+        this._handleLeaveGame(player, command.gameID);
         return undefined as InteractableCommandReturnType<CommandType>;
       }
       default: {
@@ -77,7 +77,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     }
   }
 
-  private handleJoinCommand(player: Player): {gameID: string} {
+  private _handleJoinCommand(player: Player): { gameID: string } {
     let game = this._game;
     if (!game || game.state.status === 'OVER') {
       // No game in progress, make a new one
@@ -89,7 +89,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     return { gameID: game.id };
   }
 
-  private handleGameMove(player: Player, gameID: string, move: DrawThePerfectShapeMove): void {
+  private _handleGameMove(player: Player, gameID: string, move: DrawThePerfectShapeMove): void {
     const game = this._game;
     if (!game) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -98,14 +98,17 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
     game.applyMove({
-      move: move,
+      move,
       playerID: player.id,
-      gameID: gameID,
+      gameID,
     });
     this._stateUpdated(game.toModel());
   }
 
-  private handlePickDifficulty(gameID: string, gameDifficulty: DrawThePerfectShapeDifficulty): void {
+  private _handlePickDifficulty(
+    gameID: string,
+    gameDifficulty: DrawThePerfectShapeDifficulty,
+  ): void {
     const game = this._game;
     if (!game) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -113,12 +116,12 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    this.handleDifficulty(gameDifficulty);
+    this._handleDifficulty(gameDifficulty);
     game.state.difficulty = gameDifficulty;
     this._stateUpdated(game.toModel());
   }
 
-  private handleStartGame(gameID: string): void {
+  private _handleStartGame(gameID: string): void {
     const game = this._game;
     if (!game) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -127,14 +130,14 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
     game.state.start_time = Date.now() / 1000;
-    this._stateUpdated(game.toModel())
+    this._stateUpdated(game.toModel());
   }
 
-  private handleLeaveGame(player: Player, gameID: string): void {
+  private _handleLeaveGame(player: Player, gameID: string): void {
     const game = this._game;
     if (!game) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-    } 
+    }
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
@@ -146,13 +149,13 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     return 'DrawThePerfectShapeArea';
   }
 
-  private handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
+  private _handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
     let difficulties: DrawThePerfectShapeTitle[] = [];
     if (!this.game || !this.game.state) {
-      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE)
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
     if (gameDifficulty === 'Easy') {
-      difficulties = ['Circle', 'Square' , 'Star'];
+      difficulties = ['Circle', 'Square', 'Star'];
       this.game.state.timer = 10;
     }
     if (gameDifficulty === 'Medium') {
@@ -164,30 +167,30 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       this.game.state.timer = 20;
     }
     if (difficulties.length > 0) {
-      const randomShape = this.getRandomShape(difficulties);
-      const traceShapePixels = this.getTraceShapePixels(randomShape);
+      const randomShape = this._getRandomShape(difficulties);
+      const traceShapePixels = this._getTraceShapePixels(randomShape);
       const emptyShapePixels: DrawThePerfectShapePixel[] = [];
       const traceDrawThePerfectShapeShape = new Shape(
         randomShape,
         gameDifficulty,
-        traceShapePixels
-      )
+        traceShapePixels,
+      );
       const playerDrawThePerfectShapeShape = new Shape(
         randomShape,
         gameDifficulty,
-        emptyShapePixels
-      )
+        emptyShapePixels,
+      );
       this.game.state.trace_shape = traceDrawThePerfectShapeShape;
       this.game.state.player1_shape = playerDrawThePerfectShapeShape;
       this.game.state.player2_shape = playerDrawThePerfectShapeShape;
     }
   }
 
-  private getRandomShape(shapes: DrawThePerfectShapeTitle[]): DrawThePerfectShapeTitle {
+  private _getRandomShape(shapes: DrawThePerfectShapeTitle[]): DrawThePerfectShapeTitle {
     return shapes[Math.floor(Math.random() * shapes.length)];
   }
 
-  private getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
+  private _getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
     // Need to change for all different pictures
     const pixels: DrawThePerfectShapePixel[] = [];
     return pixels;
