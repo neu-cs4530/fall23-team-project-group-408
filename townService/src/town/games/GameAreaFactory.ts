@@ -24,8 +24,8 @@ export default function GameAreaFactory(
   if (gameType === 'TicTacToe') {
     return new TicTacToeGameArea(name, rect, broadcastEmitter);
   }
-  if (gameType === 'DrawThePerfectShape') {
-    return new DrawThePerfectShapeGameArea(name, rect, broadcastEmitter);
-  }
+  // if (gameType === 'DrawThePerfectShape') {
+  //   return new DrawThePerfectShapeGameArea(name, rect, broadcastEmitter);
+  // }
   throw new Error(`Unknown game area type ${mapObject.class}`);
 }
