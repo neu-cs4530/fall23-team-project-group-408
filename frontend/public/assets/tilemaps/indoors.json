@@ -615,17 +615,17 @@
                  "id":52,
                  "name":"Draw The Perfect Shape 1",
                  "properties":[
-                     {
-                      "name":"type",
-                      "type":"string",
-                      "value":"DrawThePerfectShape"
-                     }],
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"DrawThePerfectShape"
+                        }],
                  "rotation":0,
                  "type":"GameArea",
                  "visible":true,
                  "width":156.913420712572,
-                 "x":3489.01606055012,
-                 "y":930.404282813365
+                 "x":2082.33339486801,
+                 "y":467.971201772198
                 }],
          "opacity":1,
          "type":"objectgroup",
