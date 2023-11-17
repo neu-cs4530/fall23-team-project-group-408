@@ -1,5 +1,5 @@
 import { Table, Tbody, Td, Thead, Tr } from '@chakra-ui/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { GameResult } from '../../../types/CoveyTownSocket';
 
 /**
@@ -16,6 +16,7 @@ import { GameResult } from '../../../types/CoveyTownSocket';
  * @returns
  */
 export default function Leaderboard({ results }: { results: GameResult[] }): JSX.Element {
+  const [searchInput, setSearchInput] = useState('');
   const winsLossesTiesByPlayer: Record<
     string,
     { player: string; wins: number; losses: number; ties: number }
@@ -69,28 +70,39 @@ export default function Leaderboard({ results }: { results: GameResult[] }): JSX
   });
   const rows = Object.keys(winsLossesTiesByPlayer).map(player => winsLossesTiesByPlayer[player]);
   rows.sort((a, b) => b.wins - a.wins);
+  const filterByPlayers = rows.filter(record =>
+    record.player.toLowerCase().includes(searchInput.toLowerCase()),
+  );
   return (
-    <Table>
-      <Thead>
-        <Tr>
-          <th>Player</th>
-          <th>Wins</th>
-          <th>Losses</th>
-          <th>Ties</th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {rows.map(record => {
-          return (
-            <Tr key={record.player}>
-              <Td>{record.player}</Td>
-              <Td>{record.wins}</Td>
-              <Td>{record.losses}</Td>
-              <Td>{record.ties}</Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+    <div>
+      <input
+        type='text'
+        placeholder='Search by player name'
+        value={searchInput}
+        onChange={p => setSearchInput(p.target.value)}
+      />
+      <Table>
+        <Thead>
+          <Tr>
+            <th>Player</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Ties</th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {filterByPlayers.map(record => {
+            return (
+              <Tr key={record.player}>
+                <Td>{record.player}</Td>
+                <Td>{record.wins}</Td>
+                <Td>{record.losses}</Td>
+                <Td>{record.ties}</Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </div>
   );
 }
