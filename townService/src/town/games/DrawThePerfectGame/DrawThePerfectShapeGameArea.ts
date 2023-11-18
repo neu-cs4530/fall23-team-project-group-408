@@ -47,6 +47,28 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     this._emitAreaChanged();
   }
 
+  /**
+   * Handle a command from a player in this game area.
+   * Supported commands:
+   * - JoinGame (joins the game `this._game`, or creates a new one if none is in progress)
+   * - GameMove (applies a move to the game)
+   * - LeaveGame (leaves the game)
+   * - PickDifficulty (picks the difficulty of the game)
+   * - StartGame (starts the game)
+   *
+   * If the command ended the game, records the outcome in this._history
+   * If the command is successful (does not throw an error), calls this._emitAreaChanged (necessary
+   *  to notify any listeners of a state update, including any change to history)
+   * If the command is unsuccessful (throws an error), the error is propagated to the caller
+   *
+   * @param command command to handle
+   * @param player player making the request
+   * @returns response to the command, @see InteractableCommandResponse
+   * @throws InvalidParametersError if the command is not supported or is invalid. Invalid commands:
+   *  - LeaveGame and GameMove: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
+   *        or gameID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
+   *  - Any command besides LeaveGame, GameMove and JoinGame: INVALID_COMMAND_MESSAGE
+   */
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
@@ -77,18 +99,35 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     }
   }
 
+  /**
+   * Handle the Join Command to let the player join the game. If the game doesn't exists or is
+   * over, create a new game.
+   *
+   * @param player player making the request
+   * @returns the gameID of the game being created.
+   */
   private _handleJoinCommand(player: Player): { gameID: string } {
     let game = this._game;
     if (!game || game.state.status === 'OVER') {
       // No game in progress, make a new one
       game = new DrawThePerfectShapeGame();
       this._game = game;
+      this._handleDifficulty(game, game.state.difficulty);
     }
     game.join(player);
     this._stateUpdated(game.toModel());
     return { gameID: game.id };
   }
 
+  /**
+   * Handles the player making a game move command.
+   *
+   * @param player player making the request
+   * @param gameID id of the game
+   * @param move the move the player is making
+   * @throws InvalidParametersError: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
+   * - or gameID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
+   */
   private _handleGameMove(player: Player, gameID: string, move: DrawThePerfectShapeMove): void {
     const game = this._game;
     if (!game) {
@@ -105,6 +144,14 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     this._stateUpdated(game.toModel());
   }
 
+  /**
+   * Handles the player choosing the game difficulty
+   *
+   * @param gameID id of the game
+   * @param gameDifficulty the game difficulty the player is choosing
+   * @throws InvalidParametersError: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
+   * - or gameID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
+   */
   private _handlePickDifficulty(
     gameID: string,
     gameDifficulty: DrawThePerfectShapeDifficulty,
@@ -116,11 +163,18 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    this._handleDifficulty(gameDifficulty);
+    this._handleDifficulty(game, gameDifficulty);
     game.state.difficulty = gameDifficulty;
     this._stateUpdated(game.toModel());
   }
 
+  /**
+   * Handles starting the game
+   *
+   * @param gameID id of the game
+   * @throws InvalidParametersError: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
+   * - or gameID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
+   */
   private _handleStartGame(gameID: string): void {
     const game = this._game;
     if (!game) {
@@ -129,7 +183,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    game.state.start_time = Date.now() / 1000;
+    game.state.last_time = Date.now() / 1000;
     this._stateUpdated(game.toModel());
   }
 
@@ -149,22 +203,34 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     return 'DrawThePerfectShapeArea';
   }
 
-  private _handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
+  /**
+   * Depending on the difficulty, choose a random shape and set the state to the correct starting
+   * parameters
+   *
+   * @param game the new game state that is being changed
+   * @param gameDifficulty the game difficulty the player is choosing
+   * * @throws InvalidParametersError: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
+   *
+   */
+  private _handleDifficulty(
+    game: DrawThePerfectShapeGame,
+    gameDifficulty: DrawThePerfectShapeDifficulty,
+  ): void {
     let difficulties: DrawThePerfectShapeTitle[] = [];
-    if (!this.game || !this.game.state) {
+    if (!game || !game.state) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
     if (gameDifficulty === 'Easy') {
       difficulties = ['Circle', 'Square', 'Star'];
-      this.game.state.timer = 10;
+      game.state.timer = 10;
     }
     if (gameDifficulty === 'Medium') {
       difficulties = ['Umbrella', 'House', 'Christmas Tree'];
-      this.game.state.timer = 15;
+      game.state.timer = 15;
     }
     if (gameDifficulty === 'Hard') {
       difficulties = ['Helicopter', 'Car', 'Husky'];
-      this.game.state.timer = 20;
+      game.state.timer = 20;
     }
     if (difficulties.length > 0) {
       const randomShape = this._getRandomShape(difficulties);
@@ -180,16 +246,28 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
         gameDifficulty,
         emptyShapePixels,
       );
-      this.game.state.trace_shape = traceDrawThePerfectShapeShape;
-      this.game.state.player1_shape = playerDrawThePerfectShapeShape;
-      this.game.state.player2_shape = playerDrawThePerfectShapeShape;
+      game.state.trace_shape = traceDrawThePerfectShapeShape;
+      game.state.player1_shape = playerDrawThePerfectShapeShape;
+      game.state.player2_shape = playerDrawThePerfectShapeShape;
     }
   }
 
+  /**
+   * Gets a random shape.
+   *
+   * @param shapes the shapes that are avaiable to be picked
+   * @returns the randomized shape
+   */
   private _getRandomShape(shapes: DrawThePerfectShapeTitle[]): DrawThePerfectShapeTitle {
     return shapes[Math.floor(Math.random() * shapes.length)];
   }
 
+  /**
+   * Get the pixels of the traced shape
+   *
+   * @param traceShape the shape being traced
+   * @returns the pixels of the shape being traced
+   */
   private _getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
     // Need to change for all different pictures
     const pixels: DrawThePerfectShapePixel[] = [];

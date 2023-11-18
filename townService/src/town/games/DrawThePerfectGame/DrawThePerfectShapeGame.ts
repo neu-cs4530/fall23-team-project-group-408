@@ -20,7 +20,9 @@ export default class DrawThePerfectShapeGame extends Game<
       status: 'WAITING_TO_START',
       difficulty: 'Easy',
       timer: 10,
-      start_time: 0,
+      last_time: 0,
+      accuracy1: 0,
+      accuracy2: 0,
     });
   }
 
@@ -39,10 +41,14 @@ export default class DrawThePerfectShapeGame extends Game<
     if (!this.state.player1_shape || !this.state.player2_shape || !this.state.trace_shape) {
       throw new InvalidParametersError(SHAPE_DOES_NOT_EXISTS);
     }
-    if (currentTimeNow - this.state.start_time > this.state.timer) {
+    this.state.timer -= currentTimeNow - this.state.last_time;
+    this.state.last_time = currentTimeNow;
+    if (this.state.timer < 0) {
       this.state.status = 'OVER';
       const player1Accuracy = this.state.trace_shape.accuracy(this.state.player1_shape);
       const player2Accuracy = this.state.trace_shape.accuracy(this.state.player2_shape);
+      this.state.accuracy1 = player1Accuracy;
+      this.state.accuracy2 = player2Accuracy;
       if (player1Accuracy > player2Accuracy) {
         this.state.winner = this.state.player1;
       } else {
@@ -117,8 +123,10 @@ export default class DrawThePerfectShapeGame extends Game<
         player2_shape: undefined,
         difficulty: 'Easy',
         timer: 10,
-        start_time: 0,
+        last_time: 0,
         status: 'WAITING_TO_START',
+        accuracy1: 0,
+        accuracy2: 0,
       };
       return;
     }
