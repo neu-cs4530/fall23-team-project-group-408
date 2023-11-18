@@ -251,11 +251,11 @@ export interface DrawThePerfectShapeGameState extends WinnableGameState {
   player2?: PlayerID;
   trace_shape?: DrawThePerfectShapeShape;
   timer: number;
-  start_time: number;
+  last_time: number;
   difficulty: DrawThePerfectShapeDifficulty;
   player1_shape?: DrawThePerfectShapeShape;
   player2_shape?: DrawThePerfectShapeShape;
-  
+  accuracy: number;
 }
 
 export interface DrawThePerfectShapeMove {
