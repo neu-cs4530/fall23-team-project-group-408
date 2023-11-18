@@ -255,7 +255,8 @@ export interface DrawThePerfectShapeGameState extends WinnableGameState {
   difficulty: DrawThePerfectShapeDifficulty;
   player1_shape?: DrawThePerfectShapeShape;
   player2_shape?: DrawThePerfectShapeShape;
-  accuracy: number;
+  accuracy1: number;
+  accuracy2: number;
 }
 
 export interface DrawThePerfectShapeMove {

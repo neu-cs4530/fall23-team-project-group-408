@@ -21,7 +21,8 @@ export default class DrawThePerfectShapeGame extends Game<
       difficulty: 'Easy',
       timer: 10,
       last_time: 0,
-      accuracy: 0,
+      accuracy1: 0,
+      accuracy2: 0,
     });
   }
 
@@ -46,6 +47,8 @@ export default class DrawThePerfectShapeGame extends Game<
       this.state.status = 'OVER';
       const player1Accuracy = this.state.trace_shape.accuracy(this.state.player1_shape);
       const player2Accuracy = this.state.trace_shape.accuracy(this.state.player2_shape);
+      this.state.accuracy1 = player1Accuracy;
+      this.state.accuracy2 = player2Accuracy;
       if (player1Accuracy > player2Accuracy) {
         this.state.winner = this.state.player1;
       } else {
@@ -122,7 +125,8 @@ export default class DrawThePerfectShapeGame extends Game<
         timer: 10,
         last_time: 0,
         status: 'WAITING_TO_START',
-        accuracy: 0,
+        accuracy1: 0,
+        accuracy2: 0,
       };
       return;
     }

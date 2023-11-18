@@ -67,11 +67,24 @@ export default class DrawThePerfectShapeController extends GameAreaController<
     return undefined;
   }
 
-  get accuracy(): number {
+  /**
+   * Returns the accuracy of player one, if the game is over, else throws an error
+   */
+  get playerOneAccuracy(): number {
     if (this._model.game === undefined || this._model.game.state.status !== 'OVER') {
       throw Error('Game has not ended yet');
     }
-    return this._model.game.state.accuracy;
+    return this._model.game.state.accuracy1;
+  }
+
+  /**
+   * Returns the accuracy of player two, if the game is over, else throws an error
+   */
+  get playerTwoAccuracy(): number {
+    if (this._model.game === undefined || this._model.game.state.status !== 'OVER') {
+      throw Error('Game has not ended yet');
+    }
+    return this._model.game.state.accuracy2;
   }
 
   /**
