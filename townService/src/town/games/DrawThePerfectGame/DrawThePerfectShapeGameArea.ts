@@ -83,6 +83,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       // No game in progress, make a new one
       game = new DrawThePerfectShapeGame();
       this._game = game;
+      this._handleDifficulty(game, game.state.difficulty);
     }
     game.join(player);
     this._stateUpdated(game.toModel());
@@ -116,7 +117,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    this._handleDifficulty(gameDifficulty);
+    this._handleDifficulty(game, gameDifficulty);
     game.state.difficulty = gameDifficulty;
     this._stateUpdated(game.toModel());
   }
@@ -149,22 +150,25 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     return 'DrawThePerfectShapeArea';
   }
 
-  private _handleDifficulty(gameDifficulty: DrawThePerfectShapeDifficulty): void {
+  private _handleDifficulty(
+    game: DrawThePerfectShapeGame,
+    gameDifficulty: DrawThePerfectShapeDifficulty,
+  ): void {
     let difficulties: DrawThePerfectShapeTitle[] = [];
-    if (!this.game || !this.game.state) {
+    if (!game || !game.state) {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
     if (gameDifficulty === 'Easy') {
       difficulties = ['Circle', 'Square', 'Star'];
-      this.game.state.timer = 10;
+      game.state.timer = 10;
     }
     if (gameDifficulty === 'Medium') {
       difficulties = ['Umbrella', 'House', 'Christmas Tree'];
-      this.game.state.timer = 15;
+      game.state.timer = 15;
     }
     if (gameDifficulty === 'Hard') {
       difficulties = ['Helicopter', 'Car', 'Husky'];
-      this.game.state.timer = 20;
+      game.state.timer = 20;
     }
     if (difficulties.length > 0) {
       const randomShape = this._getRandomShape(difficulties);
@@ -180,9 +184,9 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
         gameDifficulty,
         emptyShapePixels,
       );
-      this.game.state.trace_shape = traceDrawThePerfectShapeShape;
-      this.game.state.player1_shape = playerDrawThePerfectShapeShape;
-      this.game.state.player2_shape = playerDrawThePerfectShapeShape;
+      game.state.trace_shape = traceDrawThePerfectShapeShape;
+      game.state.player1_shape = playerDrawThePerfectShapeShape;
+      game.state.player2_shape = playerDrawThePerfectShapeShape;
     }
   }
 
