@@ -4,6 +4,7 @@ type CanvasProps = {
   width?: string;
   height?: string;
   penColor: string;
+  canPaint?: boolean;
 };
 
 type Coordinate = {
@@ -84,23 +85,25 @@ const Canvas = (props: CanvasProps) => {
       return;
     }
 
-    const handleMouseDown = (event: MouseEvent) => startPaint(event);
-    const handleMouseMove = (event: MouseEvent) => paint(event);
-    const handleMouseUp = () => exitPaint();
-    const handleMouseLeave = () => exitPaint();
+    if (props.canPaint) {
+      const handleMouseDown = (event: MouseEvent) => startPaint(event);
+      const handleMouseMove = (event: MouseEvent) => paint(event);
+      const handleMouseUp = () => exitPaint();
+      const handleMouseLeave = () => exitPaint();
 
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseup', handleMouseUp);
-    canvas.addEventListener('mouseleave', handleMouseLeave);
+      canvas.addEventListener('mousedown', handleMouseDown);
+      canvas.addEventListener('mousemove', handleMouseMove);
+      canvas.addEventListener('mouseup', handleMouseUp);
+      canvas.addEventListener('mouseleave', handleMouseLeave);
 
-    return () => {
-      canvas.removeEventListener('mousedown', handleMouseDown);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mouseup', handleMouseUp);
-      canvas.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [startPaint, paint, exitPaint]);
+      return () => {
+        canvas.removeEventListener('mousedown', handleMouseDown);
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('mouseup', handleMouseUp);
+        canvas.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    }
+  }, [startPaint, paint, exitPaint, props.canPaint]);
 
   return (
     <canvas
