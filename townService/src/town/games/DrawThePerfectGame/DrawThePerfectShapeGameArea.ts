@@ -130,7 +130,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (this._game?.id !== gameID) {
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
-    game.state.start_time = Date.now() / 1000;
+    game.state.last_time = Date.now() / 1000;
     this._stateUpdated(game.toModel());
   }
 
