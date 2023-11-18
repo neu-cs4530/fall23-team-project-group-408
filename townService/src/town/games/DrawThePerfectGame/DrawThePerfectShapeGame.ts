@@ -41,8 +41,8 @@ export default class DrawThePerfectShapeGame extends Game<
     }
     if (currentTimeNow - this.state.start_time > this.state.timer) {
       this.state.status = 'OVER';
-      const player1Accuracy = this.state.player1_shape?.accuracy(this.state.player1_shape);
-      const player2Accuracy = this.state.player2_shape?.accuracy(this.state.player2_shape);
+      const player1Accuracy = this.state.trace_shape?.accuracy(this.state.player1_shape);
+      const player2Accuracy = this.state.trace_shape?.accuracy(this.state.player2_shape);
       if (player1Accuracy > player2Accuracy) {
         this.state.winner = this.state.player1;
       } else {
