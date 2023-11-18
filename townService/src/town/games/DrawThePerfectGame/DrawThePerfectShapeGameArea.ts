@@ -169,7 +169,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
   }
 
   /**
-   * Handles starting the game. 
+   * Handles starting the game
    *
    * @param gameID id of the game
    * @throws InvalidParametersError: No game in progress (GAME_NOT_IN_PROGRESS_MESSAGE),
