@@ -104,7 +104,7 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
 
   if (gameArea && gameArea.getData('type') === 'DrawThePerfectShape') {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='5xl'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{gameArea.name}</ModalHeader>
