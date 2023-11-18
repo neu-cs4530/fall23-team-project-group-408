@@ -6,9 +6,9 @@ import {
   GameMove,
 } from '../../../types/CoveyTownSocket';
 import InvalidParametersError, {
-  GAME_FULL_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
+  SHAPE_DOES_NOT_EXISTS,
 } from '../../../lib/InvalidParametersError';
 
 export default class DrawThePerfectShapeGame extends Game<
@@ -18,11 +18,37 @@ export default class DrawThePerfectShapeGame extends Game<
   public constructor() {
     super({
       status: 'WAITING_TO_START',
+      difficulty: 'Easy',
+      timer: 10,
+      start_time: 0,
     });
   }
 
   public applyMove(move: GameMove<DrawThePerfectShapeMove>): void {
-    throw new Error('Method not implemented.');
+    if (move.playerID === this.state.player1) {
+      this.state.player1_shape?.addPixels(move.move.pixels);
+    }
+    if (move.playerID === this.state.player2) {
+      this.state.player2_shape?.addPixels(move.move.pixels);
+    }
+    this._handleGameEnding();
+  }
+
+  private _handleGameEnding(): void {
+    const currentTimeNow = Date.now() / 1000;
+    if (!this.state.player1_shape || !this.state.player2_shape || !this.state.trace_shape) {
+      throw new InvalidParametersError(SHAPE_DOES_NOT_EXISTS);
+    }
+    if (currentTimeNow - this.state.start_time > this.state.timer) {
+      this.state.status = 'OVER';
+      const player1Accuracy = this.state.trace_shape.accuracy(this.state.player1_shape);
+      const player2Accuracy = this.state.trace_shape.accuracy(this.state.player2_shape);
+      if (player1Accuracy > player2Accuracy) {
+        this.state.winner = this.state.player1;
+      } else {
+        this.state.winner = this.state.player2;
+      }
+    }
   }
 
   /**
@@ -50,7 +76,11 @@ export default class DrawThePerfectShapeGame extends Game<
         player2: player.id,
       };
     } else {
-      throw new InvalidParametersError(GAME_FULL_MESSAGE);
+      // throw new InvalidParametersError(GAME_FULL_MESSAGE);
+      const newPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
+      if (newPlayer !== undefined) {
+        throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+      }
     }
     if (this.state.player1 && this.state.player2) {
       this.state = {
@@ -71,7 +101,12 @@ export default class DrawThePerfectShapeGame extends Game<
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
   protected _leave(player: Player): void {
-    if (this.state.player1 !== player.id && this.state.player2 !== player.id) {
+    const findPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
+    if (
+      this.state.player1 !== player.id &&
+      this.state.player2 !== player.id &&
+      findPlayer?.id !== player.id
+    ) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     // Handles case where the game has not started yet
@@ -80,6 +115,9 @@ export default class DrawThePerfectShapeGame extends Game<
         trace_shape: undefined,
         player1_shape: undefined,
         player2_shape: undefined,
+        difficulty: 'Easy',
+        timer: 10,
+        start_time: 0,
         status: 'WAITING_TO_START',
       };
       return;
