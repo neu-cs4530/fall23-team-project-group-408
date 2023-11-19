@@ -1,3 +1,4 @@
+import { assert, trace } from 'console';
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_ID_MISSMATCH_MESSAGE,
@@ -18,6 +19,8 @@ import {
 import DrawThePerfectShapeGame from './DrawThePerfectShapeGame';
 import GameArea from '../GameArea';
 import Shape from './Shapes/Shape';
+import Circle from './Shapes/Circle';
+import Square from './Shapes/Square';
 
 /**
  * Dummy comment
@@ -269,8 +272,13 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
    * @returns the pixels of the shape being traced
    */
   private _getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
-    // Need to change for all different pictures
-    const pixels: DrawThePerfectShapePixel[] = [];
-    return pixels;
+    if (traceShape === 'Circle' || traceShape === 'Star' || traceShape === 'Square') {
+      return Circle.CIRCLEPIXELS;
+    }
+    if (traceShape === 'Umbrella' || traceShape === 'House' || traceShape === 'Christmas Tree') {
+      return Square.PIXELS;
+    }
+
+    return Circle.CIRCLEPIXELS;
   }
 }
