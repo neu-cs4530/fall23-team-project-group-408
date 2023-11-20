@@ -27,7 +27,7 @@ export default class Shape implements DrawThePerfectShapeShape {
    * @param pixels
    */
   addPixels(pixels: DrawThePerfectShapePixel[]) {
-    this.pixels.push(...pixels);
+    this.pixels = pixels;
   }
 
   /**
