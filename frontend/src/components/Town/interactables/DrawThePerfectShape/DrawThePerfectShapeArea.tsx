@@ -122,7 +122,7 @@ function DrawThePerfectShapeArea({
       await gameAreaController.makeMove(1, player1FrontendPixels);
     };
     if (timer > 0 && status === 'IN_PROGRESS' && pressedStart) {
-      const intervalId = setInterval(myFunction, 1000); // 500 milliseconds (half a second)
+      const intervalId = setInterval(myFunction, 500); // 500 milliseconds (half a second)
       return () => clearInterval(intervalId);
     }
   }, [gameAreaController, status, timer, pressedStart, player1FrontendPixels]);

@@ -75,14 +75,14 @@ const Canvas = (props: CanvasProps) => {
       const canvas: HTMLCanvasElement = canvasRef.current;
       const context = canvas.getContext('2d');
       if (context) {
-        // context.strokeStyle = props.penColor;
-        // context.lineJoin = 'round';
-        // context.lineWidth = 3;
+        context.strokeStyle = props.penColor;
+        context.lineJoin = 'round';
+        context.lineWidth = 3;
 
-        // context.beginPath();
-        // context.moveTo(originalMousePosition.x, originalMousePosition.y);
-        // context.lineTo(newMousePosition.x, newMousePosition.y);
-        // context.stroke();
+        context.beginPath();
+        context.moveTo(originalMousePosition.x, originalMousePosition.y);
+        context.lineTo(newMousePosition.x, newMousePosition.y);
+        context.stroke();
 
         context.fillStyle = props.penColor; // Set the fill style to red
         if (!canvasRef.current) {
@@ -93,12 +93,22 @@ const Canvas = (props: CanvasProps) => {
         const scaleY = canvas.height / rect.height;
 
         if (newMousePosition && props.sendPixels && props.frontendPixels) {
-          const allPixels: DrawThePerfectShapePixel[] = allPixelsPositions(newMousePosition);
-          allPixels.forEach(pixel => context.fillRect(pixel.x, pixel.y, 1, 1));
-          props.sendPixels([
-            ...props.frontendPixels,
-            ...allPixels.map(pixel => ({ x: pixel.x / scaleX, y: pixel.y / scaleY })),
-          ]);
+          // const allPixels: DrawThePerfectShapePixel[] = allPixelsPositions(newMousePosition);
+          // allPixels.forEach(pixel => context.fillRect(pixel.x, pixel.y, 1, 1));
+          const canvasImageData = context.getImageData(0, 0, 400, 400);
+          const allPixels: DrawThePerfectShapePixel[] = [];
+          for (let x = 0; x < canvasImageData.width; x++) {
+            for (let y = 0; y < canvasImageData.height; y++) {
+              const index = (y * canvasImageData.width + x) * 4;
+              const r = canvasImageData.data[index];
+              const g = canvasImageData.data[index + 1];
+              const b = canvasImageData.data[index + 2];
+              if ((r !== 255 || g !== 255 || b !== 255) && (r !== 0 || g !== 0 || b !== 0)) {
+                allPixels.push({ x: x / scaleX, y: y / scaleY });
+              }
+            }
+          }
+          props.sendPixels(allPixels);
         }
       }
     },
@@ -122,6 +132,9 @@ const Canvas = (props: CanvasProps) => {
     setIsPainting(false);
   }, []);
 
+  /**
+   * Add the mouse event listeners to the canvas
+   */
   useEffect(() => {
     const canvas: HTMLCanvasElement | null = canvasRef.current;
     if (!canvas) {
