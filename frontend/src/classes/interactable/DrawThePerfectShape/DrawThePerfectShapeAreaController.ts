@@ -164,6 +164,13 @@ export default class DrawThePerfectShapeController extends GameAreaController<
   }
 
   /**
+   * Returns true if the current player is a player in this game
+   */
+  get isPlayer(): boolean {
+    return this._model.game?.players.includes(this._townController.ourPlayer.id) || false;
+  }
+
+  /**
    * Checks if the game has two players
    * @returns if there are two players currently in the game
    */
@@ -193,8 +200,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
         if (!_.isEqual(this._difficulty, newDifficulty)) {
           this._difficulty = newDifficulty;
           this.emit('difficultyChanged', this._difficulty);
-          this.emit('traceShapePixels', newState.state.trace_shape.pixels);
-          this.emit('traceShapeTitle', newState.state.trace_shape.title);
+          this.emit('traceShapeChanged', newState.state.trace_shape);
         }
       }
       if (!_.isEqual(this._timer, newTimer)) {
