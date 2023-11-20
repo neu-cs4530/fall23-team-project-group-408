@@ -50,23 +50,6 @@ const Canvas = (props: CanvasProps) => {
     }
   }, []);
 
-  const allPixelsPositions = (newMousePosition: Coordinate): DrawThePerfectShapePixel[] => {
-    const allPixels: DrawThePerfectShapePixel[] = [];
-    for (let i = -1; i < 2; i++) {
-      for (let j = -1; j < 2; j++) {
-        if (
-          newMousePosition.x + i >= 0 &&
-          newMousePosition.y + j >= 0 &&
-          newMousePosition.x + i < 400 &&
-          newMousePosition.y + j < 400
-        ) {
-          allPixels.push({ x: newMousePosition.x + i, y: newMousePosition.y + j });
-        }
-      }
-    }
-    return allPixels;
-  };
-
   const drawLine = useCallback(
     (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
       if (!canvasRef.current || !originalMousePosition || !newMousePosition) {

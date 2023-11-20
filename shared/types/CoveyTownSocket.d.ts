@@ -282,7 +282,7 @@ export interface DrawThePerfectShapeShape {
 export type DrawThePerfectShapeDifficulty = 'Easy' | 'Medium' | 'Hard';
 
 export type DrawThePerfectShapeTitle = 'Circle' | 'Square' | 'Star' | 'Umbrella' | 'House' | 
-'Christmas Tree' | 'Helicopter' | 'Car' | 'Husky';
+'Christmas Tree' | 'Helicopter' | 'Car' | 'Bird';
 
 
 

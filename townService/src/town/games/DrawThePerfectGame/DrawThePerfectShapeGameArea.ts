@@ -21,6 +21,14 @@ import GameArea from '../GameArea';
 import Shape from './Shapes/Shape';
 import Circle from './Shapes/Circle';
 import Square from './Shapes/Square';
+import Bird from './Shapes/Bird';
+import Car from './Shapes/Car';
+import Helicopter from './Shapes/Helicopter';
+import House from './Shapes/House';
+import Star from './Shapes/Star';
+import Umbrella from './Shapes/Umbrella';
+import Christmas from './Shapes/Christmas';
+
 
 /**
  * Dummy comment
@@ -232,7 +240,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       game.state.timer = 15;
     }
     if (gameDifficulty === 'Hard') {
-      difficulties = ['Helicopter', 'Car', 'Husky'];
+      difficulties = ['Helicopter', 'Car', 'Bird'];
       game.state.timer = 20;
     }
     if (difficulties.length > 0) {
@@ -272,13 +280,37 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
    * @returns the pixels of the shape being traced
    */
   private _getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
-    if (traceShape === 'Circle' || traceShape === 'Star' || traceShape === 'Square') {
-      return Circle.CIRCLEPIXELS;
+    switch(traceShape) {
+      case 'Circle': {
+        return Circle.CIRCLEPIXELS;
+      }
+      case 'Star': {
+        return Star.STARPIXELS;
+      }
+      case 'Square': {
+        return Square.SQUAREPIXELS;
+      }
+      case 'House': {
+        return House.HOUSEPIXELS;
+      }
+      case 'Umbrella': {
+        return Umbrella.UMBRELLAPIXELS;
+      }
+      case 'Christmas Tree': {
+        return Christmas.CHRISTMASPIXELS;
+      }
+      case 'Car': {
+        return Car.CARPIXELS;
+      }
+      case 'Bird': {
+        return Bird.BIRDPIXELS;
+      }
+      case 'Helicopter': {
+        return Helicopter.HELICOPTERPIXELS;
+      }
+      default: {
+        return Circle.CIRCLEPIXELS;
+      }
     }
-    if (traceShape === 'Umbrella' || traceShape === 'House' || traceShape === 'Christmas Tree') {
-      return Square.PIXELS;
-    }
-
-    return Circle.CIRCLEPIXELS;
   }
 }

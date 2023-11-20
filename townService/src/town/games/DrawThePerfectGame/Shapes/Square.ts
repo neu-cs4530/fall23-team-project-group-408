@@ -1,6 +1,6 @@
 import { DrawThePerfectShapePixel } from '../../../../types/CoveyTownSocket';
 
-const PIXELS: DrawThePerfectShapePixel[] = [
+const SQUAREPIXELS: DrawThePerfectShapePixel[] = [
   {
     x: 98,
     y: 97,
@@ -19186,4 +19186,4 @@ const PIXELS: DrawThePerfectShapePixel[] = [
     y: 302,
   },
 ];
-export default { PIXELS };
+export default { SQUAREPIXELS };
