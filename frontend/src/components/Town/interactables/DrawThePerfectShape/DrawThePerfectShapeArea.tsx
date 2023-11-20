@@ -120,7 +120,6 @@ function DrawThePerfectShapeArea({
   useEffect(() => {
     const myFunction = async () => {
       await gameAreaController.makeMove(1, player1FrontendPixels);
-      setPlayer1FrontendPixels([]);
     };
     if (timer > 0 && status === 'IN_PROGRESS' && pressedStart) {
       const intervalId = setInterval(myFunction, 1000); // 500 milliseconds (half a second)
