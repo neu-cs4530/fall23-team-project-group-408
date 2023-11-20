@@ -641,6 +641,35 @@ describe('[T1] DrawThePerfectShapeAreaController', () => {
         expect(traceShapeTitleCall).toBeDefined();
         if (difficultyChangedCall) expect(difficultyChangedCall[1]).toEqual('Hard');
       });
+      it('should not emit difficultyChanged if the trace_shape is undefined', () => {
+        const model = controller.toInteractableAreaModel();
+        const newDifficulty = 'Hard';
+        assert(model.game);
+        const newModel: GameArea<DrawThePerfectShapeGameState> = {
+          ...model,
+          game: {
+            ...model.game,
+            state: {
+              ...model.game?.state,
+              difficulty: newDifficulty,
+            },
+          },
+        };
+        expect(controller.difficulty).toEqual('Easy');
+        const emitSpy = jest.spyOn(controller, 'emit');
+        controller.updateFrom(newModel, otherPlayers.concat(ourPlayer));
+        const difficultyChangedCall = emitSpy.mock.calls.find(
+          call => call[0] === 'difficultyChanged',
+        );
+        const traceShapePixelsCall = emitSpy.mock.calls.find(
+          call => call[0] === 'traceShapePixels',
+        );
+        const traceShapeTitleCall = emitSpy.mock.calls.find(call => call[0] === 'traceShapeTitle');
+        expect(difficultyChangedCall).toBeUndefined();
+        expect(traceShapePixelsCall).toBeUndefined();
+        expect(traceShapeTitleCall).toBeUndefined();
+        if (difficultyChangedCall) expect(difficultyChangedCall[1]).toEqual('Hard');
+      });
       it('should emit a playerOnePixelChanged event with the new pixels', () => {
         const model = controller.toInteractableAreaModel();
         const newShape = {
@@ -780,6 +809,49 @@ describe('[T1] DrawThePerfectShapeAreaController', () => {
         const model = controller.toInteractableAreaModel();
         controller.updateFrom(model, otherPlayers.concat(ourPlayer));
         expect(spy).toHaveBeenCalled();
+      });
+    });
+  });
+  describe('[T1.2] pickDifficulty', () => {
+    it('should throw an error if the game is not in progress', async () => {
+      const controller = drawThePerfectShapeAreaControllerWithProp({
+        timer: 10,
+        last_time: 10,
+        difficulty: 'Easy',
+        accuracy1: 0,
+        accuracy2: 32,
+        status: 'OVER',
+        player1: ourPlayer.id,
+      });
+      await expect(async () => controller.pickDifficulty('Hard')).rejects.toEqual(
+        new Error(NO_GAME_IN_PROGRESS_ERROR),
+      );
+    });
+    it('Should call townController.sendInteractableCommand', async () => {
+      const controller = drawThePerfectShapeAreaControllerWithProp({
+        timer: 10,
+        last_time: 10,
+        difficulty: 'Easy',
+        accuracy1: 0,
+        accuracy2: 32,
+        status: 'IN_PROGRESS',
+        player1: ourPlayer.id,
+      });
+      // Simulate joining the game for real
+      const instanceID = nanoid();
+      mockTownController.sendInteractableCommand.mockImplementationOnce(async () => {
+        return { gameID: instanceID };
+      });
+      await controller.joinGame();
+      mockTownController.sendInteractableCommand.mockReset();
+      await controller.makeMove(2, []);
+      expect(mockTownController.sendInteractableCommand).toHaveBeenCalledWith(controller.id, {
+        type: 'GameMove',
+        gameID: instanceID,
+        move: {
+          player: 2,
+          pixels: [],
+        },
       });
     });
   });
