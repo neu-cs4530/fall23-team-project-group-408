@@ -1,6 +1,7 @@
 import { use } from 'matter';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DrawThePerfectShapePixel } from '../../../../types/CoveyTownSocket';
+import { send } from 'process';
 
 type CanvasProps = {
   width?: string;
@@ -49,42 +50,72 @@ const Canvas = (props: CanvasProps) => {
     }
   }, []);
 
-  const drawLine = (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
-    if (!canvasRef.current) {
-      return;
+  const allPixelsPositions = (newMousePosition: Coordinate): DrawThePerfectShapePixel[] => {
+    const allPixels: DrawThePerfectShapePixel[] = [];
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        if (
+          newMousePosition.x + i >= 0 &&
+          newMousePosition.y + j >= 0 &&
+          newMousePosition.x + i < 400 &&
+          newMousePosition.y + j < 400
+        ) {
+          allPixels.push({ x: newMousePosition.x + i, y: newMousePosition.y + j });
+        }
+      }
     }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    const context = canvas.getContext('2d');
-    if (context) {
-      context.strokeStyle = props.penColor;
-      context.lineJoin = 'round';
-      context.lineWidth = 5;
-
-      context.beginPath();
-      context.moveTo(originalMousePosition.x, originalMousePosition.y);
-      context.lineTo(newMousePosition.x, newMousePosition.y);
-
-      context.stroke();
-    }
+    return allPixels;
   };
+
+  const drawLine = useCallback(
+    (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
+      if (!canvasRef.current || !originalMousePosition || !newMousePosition) {
+        return;
+      }
+      const canvas: HTMLCanvasElement = canvasRef.current;
+      const context = canvas.getContext('2d');
+      if (context) {
+        // context.strokeStyle = props.penColor;
+        // context.lineJoin = 'round';
+        // context.lineWidth = 3;
+
+        // context.beginPath();
+        // context.moveTo(originalMousePosition.x, originalMousePosition.y);
+        // context.lineTo(newMousePosition.x, newMousePosition.y);
+        // context.stroke();
+
+        context.fillStyle = props.penColor; // Set the fill style to red
+        if (!canvasRef.current) {
+          return;
+        }
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        if (newMousePosition && props.sendPixels && props.frontendPixels) {
+          const allPixels: DrawThePerfectShapePixel[] = allPixelsPositions(newMousePosition);
+          allPixels.forEach(pixel => context.fillRect(pixel.x, pixel.y, 1, 1));
+          props.sendPixels([
+            ...props.frontendPixels,
+            ...allPixels.map(pixel => ({ x: pixel.x / scaleX, y: pixel.y / scaleY })),
+          ]);
+        }
+      }
+    },
+    [props],
+  );
 
   const paint = useCallback(
     (event: MouseEvent) => {
       if (isPainting) {
         const newMousePosition = getCoordinates(event);
-        if (props.sendPixels && props.frontendPixels && newMousePosition) {
-          props.sendPixels([
-            ...props.frontendPixels,
-            { x: newMousePosition.x, y: newMousePosition.y },
-          ]);
-        }
         if (mousePosition && newMousePosition) {
           drawLine(mousePosition, newMousePosition);
           setMousePosition(newMousePosition);
         }
       }
     },
-    [isPainting, mousePosition],
+    [drawLine, isPainting, mousePosition],
   );
 
   const exitPaint = useCallback(() => {
