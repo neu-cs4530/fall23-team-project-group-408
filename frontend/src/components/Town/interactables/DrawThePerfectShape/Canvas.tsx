@@ -1,7 +1,5 @@
-import { use } from 'matter';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DrawThePerfectShapePixel } from '../../../../types/CoveyTownSocket';
-import { send } from 'process';
 
 type CanvasProps = {
   width?: string;
@@ -10,7 +8,6 @@ type CanvasProps = {
   canPaint?: boolean;
   tracePixels: DrawThePerfectShapePixel[];
   backendPixels?: DrawThePerfectShapePixel[];
-  frontendPixels?: DrawThePerfectShapePixel[];
   sendPixels?: (pixels: DrawThePerfectShapePixel[]) => void;
 };
 
@@ -75,7 +72,7 @@ const Canvas = (props: CanvasProps) => {
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
-        if (newMousePosition && props.sendPixels && props.frontendPixels) {
+        if (newMousePosition && props.sendPixels) {
           // const allPixels: DrawThePerfectShapePixel[] = allPixelsPositions(newMousePosition);
           // allPixels.forEach(pixel => context.fillRect(pixel.x, pixel.y, 1, 1));
           const canvasImageData = context.getImageData(0, 0, 400, 400);
@@ -202,8 +199,6 @@ const Canvas = (props: CanvasProps) => {
         height: '400px',
         width: '400px',
         border: '1px solid #000',
-
-        marginBottom: '30px',
         backgroundColor: 'black',
         borderRadius: '10px',
       }}

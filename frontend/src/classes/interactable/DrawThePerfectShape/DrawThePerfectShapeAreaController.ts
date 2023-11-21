@@ -217,7 +217,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
         }
 
         if (!_.isEqual(this._playerTwoPixelCount, newPlayerTwoCount)) {
-          this._playerTwoPixelCount = newPlayerOneCount;
+          this._playerTwoPixelCount = newPlayerTwoCount;
           this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
       }
@@ -232,7 +232,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    */
   public async makeMove(player: DrawThePerfectShapePlayer, pixels: DrawThePerfectShapePixel[]) {
     const instanceID = this._instanceID;
-    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+    if (!instanceID || this._model.game?.state.status !== 'GAME_STARTED') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
     await this._townController.sendInteractableCommand(this.id, {

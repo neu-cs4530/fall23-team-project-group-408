@@ -35,7 +35,7 @@ function DrawThePerfectShapeArea({
   const [playerTwo, setPlayerTwo] = useState<string | undefined>(
     gameAreaController.playerTwo?.userName,
   );
-  const [status, setStatus] = useState<GameStatus>('WAITING_TO_START'); // ['Waiting For Players', 'Game In Progress', 'Game Over'
+  const [status, setStatus] = useState<GameStatus>('WAITING_TO_START'); // ['Waiting For Players', 'Game In Progress', 'Game Over']
   const [difficulty, setDifficulty] = useState<string>('Easy');
   const [pressedStart, setPressedStart] = useState<boolean>(false); // has the start button been pressed
   const [traceShape, setTraceShape] = useState<DrawThePerfectShapeShape | undefined>(
@@ -50,7 +50,6 @@ function DrawThePerfectShapeArea({
   const [player2FrontendPixels, setPlayer2FrontendPixels] = useState<DrawThePerfectShapePixel[]>(
     [],
   );
-
   const [player1BackendPixels, setPlayer1BackendPixels] = useState<DrawThePerfectShapePixel[]>([]);
   const [player2BackendPixels, setPlayer2BackendPixels] = useState<DrawThePerfectShapePixel[]>([]);
 
@@ -104,8 +103,6 @@ function DrawThePerfectShapeArea({
     gameAreaController.addListener('difficultyChanged', setDifficulty);
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
-    gameAreaController.addListener('playerOnePixelChanged', setPlayer1BackendPixels);
-    gameAreaController.addListener('playerTwoPixelChanged', setPlayer2BackendPixels);
     gameAreaController.addListener('gameEnd', onGameEnd);
 
     return () => {
@@ -117,16 +114,77 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController]);
 
+  // useEffect(() => {
+  //   const myFunction = async () => {
+  //     const promise1 = gameAreaController.makeMove(1, player1FrontendPixels);
+  //     const promise2 = gameAreaController.makeMove(2, player2FrontendPixels);
+  //     await Promise.all([promise1, promise2]);
+  //   };
+
+  //   if (timer > 0 && status === 'IN_PROGRESS' && pressedStart) {
+  //     const intervalId = setInterval(myFunction, 1000);
+  //     return () => {
+  //       clearInterval(intervalId);
+  //     };
+  //   }
+  // }, [
+  //   gameAreaController,
+  //   status,
+  //   timer,
+  //   pressedStart,
+  //   player1FrontendPixels,
+  //   player2FrontendPixels,
+  // ]);
+
   useEffect(() => {
-    const myFunction = async () => {
+    const sendPlayerOnePixels = async () => {
       await gameAreaController.makeMove(1, player1FrontendPixels);
     };
-    if (timer > 0 && status === 'IN_PROGRESS' && pressedStart) {
-      const intervalId = setInterval(myFunction, 500); // 500 milliseconds (half a second)
-      return () => clearInterval(intervalId);
+    if (gameAreaController.isPlayerOne) {
+      gameAreaController.addListener('playerTwoPixelChanged', setPlayer2BackendPixels);
+      if (timer > 0 && status === 'GAME_STARTED') {
+        const intervalId = setInterval(sendPlayerOnePixels, 500);
+        return () => {
+          clearInterval(intervalId);
+        };
+      }
     }
-  }, [gameAreaController, status, timer, pressedStart, player1FrontendPixels]);
+    return () => {
+      gameAreaController.removeListener('playerTwoPixelChanged', setPlayer2BackendPixels);
+    };
+  }, [
+    gameAreaController,
+    player2BackendPixels,
+    player1FrontendPixels,
+    status,
+    timer,
+    pressedStart,
+  ]);
 
+  useEffect(() => {
+    const sendPlayerTwoPixels = async () => {
+      await gameAreaController.makeMove(2, player2FrontendPixels);
+    };
+    if (gameAreaController.isPlayerTwo) {
+      gameAreaController.addListener('playerOnePixelChanged', setPlayer1BackendPixels);
+      if (timer > 0 && status === 'GAME_STARTED') {
+        const intervalId = setInterval(sendPlayerTwoPixels, 500);
+        return () => {
+          clearInterval(intervalId);
+        };
+      }
+    }
+    return () => {
+      gameAreaController.removeListener('playerOnePixelChanged', setPlayer1BackendPixels);
+    };
+  }, [
+    gameAreaController,
+    player1BackendPixels,
+    player2FrontendPixels,
+    status,
+    timer,
+    pressedStart,
+  ]);
   const areaStyles: React.CSSProperties = { width: '100%', height: '600px' };
   const canvasRowStyles: React.CSSProperties = {
     width: '100%',
@@ -143,10 +201,8 @@ function DrawThePerfectShapeArea({
   };
 
   const buttonStyles: React.CSSProperties = {
-    marginTop: '80px',
     marginLeft: 'auto',
     marginRight: '10px',
-
     color: '#FFF',
     padding: '5px',
     borderRadius: '20px',
@@ -156,38 +212,48 @@ function DrawThePerfectShapeArea({
     <div style={areaStyles}>
       Game Status: {status}
       {status === 'IN_PROGRESS' && <div>{gameAreaController.traceShape?.title}</div>}
-      <div>Timer: {Math.trunc(timer)}</div>
+      <div>Timer: {Math.max(Math.trunc(timer), 0)}</div>
       <div style={canvasRowStyles}>
         <div style={{ ...canvasStyles, marginLeft: '50px', color: '#00F' }}>
           Player 1: {playerOne ? playerOne : 'Waiting For Player'}
-          <Canvas
-            penColor='blue'
-            canPaint={gameAreaController.isPlayerOne}
-            tracePixels={traceShape ? traceShape.pixels : []}
-            frontendPixels={player1FrontendPixels}
-            sendPixels={setPlayer1FrontendPixels}
-          />
-        </div>
-        <div style={{ ...canvasStyles, marginRight: '50px', color: '#F00' }}>
-          Player 2: {playerTwo ? playerTwo : 'Waiting For Player'}
-          {gameAreaController.isPlayerTwo && (
-            <Canvas
-              penColor='red'
-              canPaint={gameAreaController.isPlayerTwo}
-              tracePixels={traceShape ? traceShape.pixels : []}
-            />
-          )}
           {gameAreaController.isPlayerOne && (
             <Canvas
-              penColor='red'
+              penColor='blue'
+              canPaint={gameAreaController.isPlayerOne && status === 'GAME_STARTED'}
+              tracePixels={traceShape ? traceShape.pixels : []}
+              sendPixels={setPlayer1FrontendPixels}
+            />
+          )}
+          {!gameAreaController.isPlayerOne && (
+            <Canvas
+              penColor='green'
               canPaint={false}
               tracePixels={traceShape ? traceShape.pixels : []}
               backendPixels={player1BackendPixels}
             />
           )}
         </div>
+        <div style={{ ...canvasStyles, marginRight: '50px', color: '#F00' }}>
+          Player 2: {playerTwo ? playerTwo : 'Waiting For Player'}
+          {gameAreaController.isPlayerTwo && (
+            <Canvas
+              penColor='red'
+              canPaint={gameAreaController.isPlayerTwo && status === 'GAME_STARTED'}
+              tracePixels={traceShape ? traceShape.pixels : []}
+              sendPixels={setPlayer2FrontendPixels}
+            />
+          )}
+          {!gameAreaController.isPlayerTwo && (
+            <Canvas
+              penColor='purple'
+              canPaint={false}
+              tracePixels={traceShape ? traceShape.pixels : []}
+              backendPixels={player2BackendPixels}
+            />
+          )}
+        </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginTop: '50px' }}>
         {gameAreaController.isPlayer && status === 'IN_PROGRESS' && !pressedStart && (
           <select
             value={difficulty}
@@ -199,14 +265,14 @@ function DrawThePerfectShapeArea({
             <option value='Hard'>Hard</option>
           </select>
         )}
-        {status !== 'IN_PROGRESS' && !gameAreaController.isPlayer && (
+        {status !== 'IN_PROGRESS' && status !== 'GAME_STARTED' && !gameAreaController.isPlayer && (
           <button
             style={{ ...buttonStyles, backgroundColor: '#00F' }}
             onClick={async () => handleJoinGame()}>
             Join Game
           </button>
         )}
-        {gameAreaController.isPlayer && status === 'IN_PROGRESS' && !pressedStart && (
+        {gameAreaController.isPlayer && status === 'IN_PROGRESS' && (
           <button
             style={{ ...buttonStyles, backgroundColor: '#F00' }}
             onClick={async () => handleStartGame()}>

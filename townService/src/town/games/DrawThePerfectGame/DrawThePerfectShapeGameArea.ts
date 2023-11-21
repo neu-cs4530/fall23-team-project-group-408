@@ -29,7 +29,6 @@ import Star from './Shapes/Star';
 import Umbrella from './Shapes/Umbrella';
 import Christmas from './Shapes/Christmas';
 
-
 /**
  * Dummy comment
  */
@@ -195,6 +194,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
       throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
     }
     game.state.last_time = Date.now() / 1000;
+    game.state.status = 'GAME_STARTED';
     this._stateUpdated(game.toModel());
   }
 
@@ -233,15 +233,15 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     }
     if (gameDifficulty === 'Easy') {
       difficulties = ['Circle', 'Square', 'Star'];
-      game.state.timer = 10;
+      game.state.timer = 20;
     }
     if (gameDifficulty === 'Medium') {
       difficulties = ['Umbrella', 'House', 'Christmas Tree'];
-      game.state.timer = 15;
+      game.state.timer = 30;
     }
     if (gameDifficulty === 'Hard') {
       difficulties = ['Helicopter', 'Car', 'Bird'];
-      game.state.timer = 20;
+      game.state.timer = 40;
     }
     if (difficulties.length > 0) {
       const randomShape = this._getRandomShape(difficulties);
@@ -280,7 +280,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
    * @returns the pixels of the shape being traced
    */
   private _getTraceShapePixels(traceShape: DrawThePerfectShapeTitle): DrawThePerfectShapePixel[] {
-    switch(traceShape) {
+    switch (traceShape) {
       case 'Circle': {
         return Circle.CIRCLEPIXELS;
       }

@@ -27,10 +27,10 @@ export default class DrawThePerfectShapeGame extends Game<
   }
 
   public applyMove(move: GameMove<DrawThePerfectShapeMove>): void {
-    if (move.playerID === this.state.player1) {
+    if (move.move.player === 1) {
       this.state.player1_shape?.addPixels(move.move.pixels);
     }
-    if (move.playerID === this.state.player2) {
+    if (move.move.player === 2) {
       this.state.player2_shape?.addPixels(move.move.pixels);
     }
     this._handleGameEnding();
