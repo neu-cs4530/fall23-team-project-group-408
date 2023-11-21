@@ -73,7 +73,7 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
-export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
+export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'GAME_STARTED' | 'OVER';
 /**
  * Base type for the state of a game
  */
@@ -282,7 +282,7 @@ export interface DrawThePerfectShapeShape {
 export type DrawThePerfectShapeDifficulty = 'Easy' | 'Medium' | 'Hard';
 
 export type DrawThePerfectShapeTitle = 'Circle' | 'Square' | 'Star' | 'Umbrella' | 'House' | 
-'Christmas Tree' | 'Helicopter' | 'Car' | 'Husky';
+'Christmas Tree' | 'Helicopter' | 'Car' | 'Bird';
 
 
 

@@ -150,6 +150,27 @@ export default class DrawThePerfectShapeController extends GameAreaController<
   }
 
   /**
+   * Returns true if the current player is player one
+   */
+  get isPlayerOne(): boolean {
+    return this._model.game?.state.player1 === this._townController.ourPlayer.id || false;
+  }
+
+  /**
+   * Returns true if the current player is player two
+   */
+  get isPlayerTwo(): boolean {
+    return this._model.game?.state.player2 === this._townController.ourPlayer.id || false;
+  }
+
+  /**
+   * Returns true if the current player is a player in this game
+   */
+  get isPlayer(): boolean {
+    return this._model.game?.players.includes(this._townController.ourPlayer.id) || false;
+  }
+
+  /**
    * Checks if the game has two players
    * @returns if there are two players currently in the game
    */
@@ -179,8 +200,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
         if (!_.isEqual(this._difficulty, newDifficulty)) {
           this._difficulty = newDifficulty;
           this.emit('difficultyChanged', this._difficulty);
-          this.emit('traceShapePixels', newState.state.trace_shape.pixels);
-          this.emit('traceShapeTitle', newState.state.trace_shape.title);
+          this.emit('traceShapeChanged', newState.state.trace_shape);
         }
       }
       if (!_.isEqual(this._timer, newTimer)) {
@@ -197,7 +217,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
         }
 
         if (!_.isEqual(this._playerTwoPixelCount, newPlayerTwoCount)) {
-          this._playerTwoPixelCount = newPlayerOneCount;
+          this._playerTwoPixelCount = newPlayerTwoCount;
           this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
       }
@@ -212,7 +232,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    */
   public async makeMove(player: DrawThePerfectShapePlayer, pixels: DrawThePerfectShapePixel[]) {
     const instanceID = this._instanceID;
-    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+    if (!instanceID || this._model.game?.state.status !== 'GAME_STARTED') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
     await this._townController.sendInteractableCommand(this.id, {
@@ -238,6 +258,23 @@ export default class DrawThePerfectShapeController extends GameAreaController<
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'PickDifficulty',
       gameDifficulty: newDifficulty,
+      gameID: instanceID,
+    });
+    this._instanceID = gameID;
+  }
+
+  /**
+   * Sends a request to the server to start the game
+   *
+   * @throws An error if the server rejects the request start the game
+   */
+  public async startGame() {
+    const instanceID = this._instanceID;
+    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+      throw new Error(NO_GAME_IN_PROGRESS_ERROR);
+    }
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'StartGame',
       gameID: instanceID,
     });
     this._instanceID = gameID;
