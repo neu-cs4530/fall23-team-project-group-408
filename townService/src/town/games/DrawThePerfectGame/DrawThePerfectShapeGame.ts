@@ -91,6 +91,7 @@ export default class DrawThePerfectShapeGame extends Game<
     if (this.state.player1 && this.state.player2) {
       this.state = {
         ...this.state,
+        status: 'IN_PROGRESS',
       };
     }
   }
