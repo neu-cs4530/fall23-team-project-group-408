@@ -301,5 +301,117 @@ describe('DrawThePerfectShapeGameArea', () => {
         expect(interactableUpdateSpy).not.toHaveBeenCalled();
       });
     });
+    describe('[T3.3] when given a StartGame command', () => {
+      describe('when there is no game in progress', () => {
+        it('should throw an error', () => {
+          expect(() =>
+            gameArea.handleCommand({ type: 'StartGame', gameID: nanoid() }, player1),
+          ).toThrowError(GAME_NOT_IN_PROGRESS_MESSAGE);
+          expect(interactableUpdateSpy).not.toHaveBeenCalled();
+        });
+      });
+      describe('when there is a game in progress', () => {
+        it('should throw an error when the game ID does not match', () => {
+          gameArea.handleCommand({ type: 'JoinGame' }, player1);
+          interactableUpdateSpy.mockClear();
+          expect(() =>
+            gameArea.handleCommand({ type: 'StartGame', gameID: nanoid() }, player1),
+          ).toThrowError(GAME_ID_MISSMATCH_MESSAGE);
+          expect(interactableUpdateSpy).not.toHaveBeenCalled();
+        });
+        it('should update last_time and call _emitAreaChanged', () => {
+          const { gameID } = gameArea.handleCommand({ type: 'JoinGame' }, player1);
+          if (!game) {
+            throw new Error('Game was not created by the first call to join');
+          }
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
+          const oldLastTime = game.state.last_time;
+          gameArea.handleCommand({ type: 'StartGame', gameID }, player1);
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
+          expect(game.state.last_time !== oldLastTime);
+        });
+      });
+    });
+    describe('[T3.3] when given a PickDifficulty command', () => {
+      describe('when there is no game in progress', () => {
+        it('should throw an error', () => {
+          expect(() =>
+            gameArea.handleCommand(
+              { type: 'PickDifficulty', gameID: nanoid(), gameDifficulty: 'Hard' },
+              player1,
+            ),
+          ).toThrowError(GAME_NOT_IN_PROGRESS_MESSAGE);
+          expect(interactableUpdateSpy).not.toHaveBeenCalled();
+        });
+      });
+      describe('when there is a game in progress', () => {
+        it('for Easy: should update timer, player1 shape, player2 shape, and trace shape and call _emitAreaChanged', () => {
+          const { gameID } = gameArea.handleCommand({ type: 'JoinGame' }, player1);
+          if (!game) {
+            throw new Error('Game was not created by the first call to join');
+          }
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
+          expect(game.state.timer).toEqual(10);
+          expect(game.state.difficulty).toEqual('Easy');
+          const oldTraceShape = game.state.trace_shape;
+          const oldPlayer1Shape = game.state.player1_shape;
+          const oldPlayer2Shape = game.state.player2_shape;
+          gameArea.handleCommand(
+            { type: 'PickDifficulty', gameID, gameDifficulty: 'Easy' },
+            player1,
+          );
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
+          expect(game.state.timer).toEqual(10);
+          expect(game.state.difficulty).toEqual('Easy');
+          expect(game.state.trace_shape !== oldTraceShape);
+          expect(game.state.player1_shape !== oldPlayer1Shape);
+          expect(game.state.player2_shape !== oldPlayer2Shape);
+        });
+        it('for Medium: should update timer, player1 shape, player2 shape, and trace shape and call _emitAreaChanged', () => {
+          const { gameID } = gameArea.handleCommand({ type: 'JoinGame' }, player1);
+          if (!game) {
+            throw new Error('Game was not created by the first call to join');
+          }
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
+          expect(game.state.timer).toEqual(10);
+          expect(game.state.difficulty).toEqual('Easy');
+          const oldTraceShape = game.state.trace_shape;
+          const oldPlayer1Shape = game.state.player1_shape;
+          const oldPlayer2Shape = game.state.player2_shape;
+          gameArea.handleCommand(
+            { type: 'PickDifficulty', gameID, gameDifficulty: 'Medium' },
+            player1,
+          );
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
+          expect(game.state.timer).toEqual(15);
+          expect(game.state.difficulty).toEqual('Medium');
+          expect(game.state.trace_shape !== oldTraceShape);
+          expect(game.state.player1_shape !== oldPlayer1Shape);
+          expect(game.state.player2_shape !== oldPlayer2Shape);
+        });
+        it('for Hard: should update timer, player1 shape, player2 shape, and trace shape and call _emitAreaChanged', () => {
+          const { gameID } = gameArea.handleCommand({ type: 'JoinGame' }, player1);
+          if (!game) {
+            throw new Error('Game was not created by the first call to join');
+          }
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
+          expect(game.state.timer).toEqual(10);
+          expect(game.state.difficulty).toEqual('Easy');
+          const oldTraceShape = game.state.trace_shape;
+          const oldPlayer1Shape = game.state.player1_shape;
+          const oldPlayer2Shape = game.state.player2_shape;
+          gameArea.handleCommand(
+            { type: 'PickDifficulty', gameID, gameDifficulty: 'Hard' },
+            player1,
+          );
+          expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
+          expect(game.state.timer).toEqual(20);
+          expect(game.state.difficulty).toEqual('Hard');
+          expect(game.state.trace_shape !== oldTraceShape);
+          expect(game.state.player1_shape !== oldPlayer1Shape);
+          expect(game.state.player2_shape !== oldPlayer2Shape);
+        });
+      });
+    });
   });
 });
