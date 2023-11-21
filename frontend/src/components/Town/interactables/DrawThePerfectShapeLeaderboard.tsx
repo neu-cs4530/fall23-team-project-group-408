@@ -93,7 +93,7 @@ export default function DrawThePerfectShapeLeaderboard({
     <div>
       <input
         type='text'
-        placeholder='Search by Player Name'
+        placeholder='Search by player name'
         value={searchInput}
         onChange={p => setSearchInput(p.target.value)}
       />
