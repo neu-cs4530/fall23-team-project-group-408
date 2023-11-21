@@ -132,6 +132,7 @@ export interface GameResult {
 
 export interface DrawThePerefectShapeGameResult {
   gameID: GameInstanceID;
+  difficulty: DrawThePerfectShapeDifficulty;
   scores: { [playerName: string]: number };
   accuracy: { [playerName: string]: number };
 }
