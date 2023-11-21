@@ -8,22 +8,24 @@ import {
 } from '../../../lib/InvalidParametersError';
 import Player from '../../../lib/Player';
 import {
-    DrawThePerfectShapeGameState,
+  DrawThePerfectShapeGameState,
   DrawThePerfectShapeMove,
   GameInstanceID,
-  TicTacToeGameState,
-  TicTacToeMove,
   TownEmitter,
 } from '../../../types/CoveyTownSocket';
-import TicTacToeGameArea from '../TicTacToeGameArea';
-import * as TicTacToeGameModule from '../TicTacToeGame';
+import * as DrawThePerfectShapeGameModule from './DrawThePerfectShapeGame';
 import Game from '../Game';
+import DrawThePerfectShapeGameArea from './DrawThePerfectShapeGameArea';
 
 class TestingGame extends Game<DrawThePerfectShapeGameState, DrawThePerfectShapeMove> {
   public constructor() {
     super({
-      moves: [],
-      status: 'WAITING_TO_START',
+      timer: 10,
+      last_time: 10,
+      difficulty: 'Easy',
+      accuracy1: 0,
+      accuracy2: 0,
+      status: 'IN_PROGRESS',
     });
   }
 
@@ -38,24 +40,24 @@ class TestingGame extends Game<DrawThePerfectShapeGameState, DrawThePerfectShape
   }
 
   protected _join(player: Player): void {
-    if (this.state.x) {
-      this.state.o = player.id;
+    if (this.state.player1) {
+      this.state.player2 = player.id;
     } else {
-      this.state.x = player.id;
+      this.state.player1 = player.id;
     }
     this._players.push(player);
   }
 
   protected _leave(): void {}
 }
-describe('TicTacToeGameArea', () => {
-  let gameArea: TicTacToeGameArea;
+describe('DrawThePerfectShapeGameArea', () => {
+  let gameArea: DrawThePerfectShapeGameArea;
   let player1: Player;
   let player2: Player;
   let interactableUpdateSpy: jest.SpyInstance;
   let game: TestingGame;
   beforeEach(() => {
-    const gameConstructorSpy = jest.spyOn(TicTacToeGameModule, 'default');
+    const gameConstructorSpy = jest.spyOn(DrawThePerfectShapeGameModule, 'default');
     game = new TestingGame();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore (Testing without using the real game class)
@@ -63,7 +65,7 @@ describe('TicTacToeGameArea', () => {
 
     player1 = createPlayerForTesting();
     player2 = createPlayerForTesting();
-    gameArea = new TicTacToeGameArea(
+    gameArea = new DrawThePerfectShapeGameArea(
       nanoid(),
       { x: 0, y: 0, width: 100, height: 100 },
       mock<TownEmitter>(),
@@ -123,7 +125,7 @@ describe('TicTacToeGameArea', () => {
       it('should throw an error when there is no game in progress', () => {
         expect(() =>
           gameArea.handleCommand(
-            { type: 'GameMove', move: { col: 0, row: 0, gamePiece: 'X' }, gameID: nanoid() },
+            { type: 'GameMove', move: { player: 1, pixels: [] }, gameID: nanoid() },
             player1,
           ),
         ).toThrowError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -138,27 +140,24 @@ describe('TicTacToeGameArea', () => {
         it('should throw an error when the game ID does not match', () => {
           expect(() =>
             gameArea.handleCommand(
-              { type: 'GameMove', move: { col: 0, row: 0, gamePiece: 'X' }, gameID: nanoid() },
+              { type: 'GameMove', move: { player: 1, pixels: [] }, gameID: nanoid() },
               player1,
             ),
           ).toThrowError(GAME_ID_MISSMATCH_MESSAGE);
         });
         it('should dispatch the move to the game and call _emitAreaChanged', () => {
-          const move: TicTacToeMove = { col: 0, row: 0, gamePiece: 'X' };
+          const move: DrawThePerfectShapeMove = { player: 1, pixels: [] };
           const applyMoveSpy = jest.spyOn(game, 'applyMove');
           gameArea.handleCommand({ type: 'GameMove', move, gameID }, player1);
           expect(applyMoveSpy).toHaveBeenCalledWith({
             gameID: game.id,
             playerID: player1.id,
-            move: {
-              ...move,
-              gamePiece: 'X',
-            },
+            move,
           });
           expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
         });
         it('should not call _emitAreaChanged if the game throws an error', () => {
-          const move: TicTacToeMove = { col: 0, row: 0, gamePiece: 'X' };
+          const move: DrawThePerfectShapeMove = { player: 1, pixels: [] };
           const applyMoveSpy = jest.spyOn(game, 'applyMove').mockImplementationOnce(() => {
             throw new Error('Test Error');
           });
@@ -168,16 +167,13 @@ describe('TicTacToeGameArea', () => {
           expect(applyMoveSpy).toHaveBeenCalledWith({
             gameID: game.id,
             playerID: player1.id,
-            move: {
-              ...move,
-              gamePiece: 'X',
-            },
+            move,
           });
           expect(interactableUpdateSpy).not.toHaveBeenCalled();
         });
         describe('when the game is over, it records a new row in the history and calls _emitAreaChanged', () => {
-          test('when X wins', () => {
-            const move: TicTacToeMove = { col: 0, row: 0, gamePiece: 'X' };
+          test('when player1 wins', () => {
+            const move: DrawThePerfectShapeMove = { player: 1, pixels: [] };
             jest.spyOn(game, 'applyMove').mockImplementationOnce(() => {
               game.endGame(player1.id);
             });
@@ -193,8 +189,8 @@ describe('TicTacToeGameArea', () => {
             });
             expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
           });
-          test('when O wins', () => {
-            const move: TicTacToeMove = { col: 0, row: 0, gamePiece: 'O' };
+          test('when player2 wins', () => {
+            const move: DrawThePerfectShapeMove = { player: 1, pixels: [] };
             jest.spyOn(game, 'applyMove').mockImplementationOnce(() => {
               game.endGame(player2.id);
             });
@@ -211,7 +207,7 @@ describe('TicTacToeGameArea', () => {
             expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
           });
           test('when there is a tie', () => {
-            const move: TicTacToeMove = { col: 0, row: 0, gamePiece: 'X' };
+            const move: DrawThePerfectShapeMove = { player: 1, pixels: [] };
             jest.spyOn(game, 'applyMove').mockImplementationOnce(() => {
               game.endGame();
             });
