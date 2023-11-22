@@ -1,10 +1,18 @@
 import {
+  Accordion,
   Modal,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Select,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
+  AccordionPanel,
+  Box,
+  Heading,
+  List,
+  ListItem,
 } from '@chakra-ui/react';
 import {
   DrawThePerfectShapeDifficulty,
@@ -19,9 +27,7 @@ import { useInteractable, useInteractableAreaController } from '../../../../clas
 import useTownController from '../../../../hooks/useTownController';
 import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
-import { use } from 'matter';
-import { set } from 'lodash';
-import { send } from 'process';
+import PlayerController from '../../../../classes/PlayerController';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
@@ -42,6 +48,7 @@ function DrawThePerfectShapeArea({
     gameAreaController.traceShape,
   ); // the shape to be traced
 
+  const [observers, setObservers] = useState<PlayerController[]>(gameAreaController.observers);
   const [timer, setTimer] = useState<number>(gameAreaController.timer); // the timer for the game
 
   const [player1FrontendPixels, setPlayer1FrontendPixels] = useState<DrawThePerfectShapePixel[]>(
@@ -94,6 +101,7 @@ function DrawThePerfectShapeArea({
       setPlayerOne(gameAreaController.playerOne?.userName);
       setPlayerTwo(gameAreaController.playerTwo?.userName);
       setStatus(gameAreaController.status);
+      setObservers(gameAreaController.observers);
     }
     function onGameEnd() {
       console.log('game ended');
@@ -208,6 +216,28 @@ function DrawThePerfectShapeArea({
     borderRadius: '20px',
   };
 
+  const observersArea = (
+    <Accordion>
+      <AccordionItem>
+        <Heading as='h3'>
+          <AccordionButton>
+            <Box as='span' flex='1' textAlign='left'>
+              Current Observers
+              <AccordionIcon />
+            </Box>
+          </AccordionButton>
+        </Heading>
+        <AccordionPanel>
+          <List aria-label='list of observers in the game'>
+            {observers.map(player => {
+              return <ListItem key={player.id}>{player.userName}</ListItem>;
+            })}
+          </List>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
+  );
+
   const area = (
     <div style={areaStyles}>
       Game Status: {status}
@@ -280,6 +310,7 @@ function DrawThePerfectShapeArea({
           </button>
         )}
       </div>
+      {observersArea}
     </div>
   );
   return area;
