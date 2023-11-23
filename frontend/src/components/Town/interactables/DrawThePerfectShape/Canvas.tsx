@@ -73,8 +73,6 @@ const Canvas = (props: CanvasProps) => {
         const scaleY = canvas.height / rect.height;
 
         if (newMousePosition && props.sendPixels) {
-          // const allPixels: DrawThePerfectShapePixel[] = allPixelsPositions(newMousePosition);
-          // allPixels.forEach(pixel => context.fillRect(pixel.x, pixel.y, 1, 1));
           const canvasImageData = context.getImageData(0, 0, 400, 400);
           const allPixels: DrawThePerfectShapePixel[] = [];
           for (let x = 0; x < canvasImageData.width; x++) {
@@ -160,37 +158,15 @@ const Canvas = (props: CanvasProps) => {
         for (const coordinate of props.tracePixels) {
           context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
         }
-      }
-    }
-  }, [props.tracePixels]);
-
-  /**
-   * Draw the backendPixels on the canvas
-   */
-  useEffect(() => {
-    const canvas: HTMLCanvasElement | null = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-    if (props.tracePixels && props.backendPixels) {
-      console.log('here');
-      const context = canvas.getContext('2d');
-      if (context) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = 'white'; // Set the fill style to red
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        for (const coordinate of props.tracePixels) {
-          context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
-        }
-        context.fillStyle = props.penColor; // Set the fill style to red
-        for (const coordinate of props.backendPixels) {
-          context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
+        if (props.backendPixels) {
+          context.fillStyle = props.penColor; // Set the fill style to red
+          for (const coordinate of props.backendPixels) {
+            context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
+          }
         }
       }
     }
-  }, [props.tracePixels, props.backendPixels, props.penColor]);
+  }, [props.backendPixels, props.penColor, props.tracePixels]);
 
   return (
     <canvas

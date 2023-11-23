@@ -44,14 +44,13 @@ function DrawThePerfectShapeArea({
 
   const [timer, setTimer] = useState<number>(gameAreaController.timer); // the timer for the game
 
-  const [player1FrontendPixels, setPlayer1FrontendPixels] = useState<DrawThePerfectShapePixel[]>(
-    [],
+  const [player1Pixels, setPlayer1Pixels] = useState<DrawThePerfectShapePixel[]>(
+    gameAreaController.playerOneShape?.pixels || [],
   );
-  const [player2FrontendPixels, setPlayer2FrontendPixels] = useState<DrawThePerfectShapePixel[]>(
-    [],
+0
+  const [player2Pixels, setPlayer2Pixels] = useState<DrawThePerfectShapePixel[]>(
+    gameAreaController.playerTwoShape?.pixels || [],
   );
-  const [player1BackendPixels, setPlayer1BackendPixels] = useState<DrawThePerfectShapePixel[]>([]);
-  const [player2BackendPixels, setPlayer2BackendPixels] = useState<DrawThePerfectShapePixel[]>([]);
 
   /**
    * Handles when a user presses the 'Join Game' button
@@ -104,7 +103,6 @@ function DrawThePerfectShapeArea({
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
     gameAreaController.addListener('gameEnd', onGameEnd);
-
     return () => {
       gameAreaController.removeListener('gameEnd', onGameEnd);
       gameAreaController.removeListener('gameUpdated', updateGameState);
@@ -114,34 +112,12 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController]);
 
-  // useEffect(() => {
-  //   const myFunction = async () => {
-  //     const promise1 = gameAreaController.makeMove(1, player1FrontendPixels);
-  //     const promise2 = gameAreaController.makeMove(2, player2FrontendPixels);
-  //     await Promise.all([promise1, promise2]);
-  //   };
-
-  //   if (timer > 0 && status === 'IN_PROGRESS' && pressedStart) {
-  //     const intervalId = setInterval(myFunction, 1000);
-  //     return () => {
-  //       clearInterval(intervalId);
-  //     };
-  //   }
-  // }, [
-  //   gameAreaController,
-  //   status,
-  //   timer,
-  //   pressedStart,
-  //   player1FrontendPixels,
-  //   player2FrontendPixels,
-  // ]);
-
   useEffect(() => {
+    gameAreaController.addListener('playerTwoPixelChanged', setPlayer2Pixels);
     const sendPlayerOnePixels = async () => {
-      await gameAreaController.makeMove(1, player1FrontendPixels);
+      await gameAreaController.makeMove(1, player1Pixels);
     };
     if (gameAreaController.isPlayerOne) {
-      gameAreaController.addListener('playerTwoPixelChanged', setPlayer2BackendPixels);
       if (timer > 0 && status === 'GAME_STARTED') {
         const intervalId = setInterval(sendPlayerOnePixels, 500);
         return () => {
@@ -150,23 +126,16 @@ function DrawThePerfectShapeArea({
       }
     }
     return () => {
-      gameAreaController.removeListener('playerTwoPixelChanged', setPlayer2BackendPixels);
+      gameAreaController.removeListener('playerTwoPixelChanged', setPlayer2Pixels);
     };
-  }, [
-    gameAreaController,
-    player2BackendPixels,
-    player1FrontendPixels,
-    status,
-    timer,
-    pressedStart,
-  ]);
+  }, [gameAreaController, status, timer, pressedStart, player1Pixels]);
 
   useEffect(() => {
+    gameAreaController.addListener('playerOnePixelChanged', setPlayer1Pixels);
     const sendPlayerTwoPixels = async () => {
-      await gameAreaController.makeMove(2, player2FrontendPixels);
+      await gameAreaController.makeMove(2, player2Pixels);
     };
     if (gameAreaController.isPlayerTwo) {
-      gameAreaController.addListener('playerOnePixelChanged', setPlayer1BackendPixels);
       if (timer > 0 && status === 'GAME_STARTED') {
         const intervalId = setInterval(sendPlayerTwoPixels, 500);
         return () => {
@@ -175,16 +144,10 @@ function DrawThePerfectShapeArea({
       }
     }
     return () => {
-      gameAreaController.removeListener('playerOnePixelChanged', setPlayer1BackendPixels);
+      gameAreaController.removeListener('playerOnePixelChanged', setPlayer1Pixels);
     };
-  }, [
-    gameAreaController,
-    player1BackendPixels,
-    player2FrontendPixels,
-    status,
-    timer,
-    pressedStart,
-  ]);
+  }, [gameAreaController, player2Pixels, status, timer, pressedStart]);
+
   const areaStyles: React.CSSProperties = { width: '100%', height: '600px' };
   const canvasRowStyles: React.CSSProperties = {
     width: '100%',
@@ -216,39 +179,47 @@ function DrawThePerfectShapeArea({
       <div style={canvasRowStyles}>
         <div style={{ ...canvasStyles, marginLeft: '50px', color: '#00F' }}>
           Player 1: {playerOne ? playerOne : 'Waiting For Player'}
+          {gameAreaController.isPlayerOne && console.log('Drawing Player 1 Canvas')}
+          {gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {gameAreaController.isPlayerOne && (
             <Canvas
               penColor='blue'
               canPaint={gameAreaController.isPlayerOne && status === 'GAME_STARTED'}
               tracePixels={traceShape ? traceShape.pixels : []}
-              sendPixels={setPlayer1FrontendPixels}
+              sendPixels={setPlayer1Pixels}
             />
           )}
+          {!gameAreaController.isPlayerOne && console.log('Not Drawing Player 1 Canvas')}
+          {!gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {!gameAreaController.isPlayerOne && (
             <Canvas
               penColor='green'
               canPaint={false}
               tracePixels={traceShape ? traceShape.pixels : []}
-              backendPixels={player1BackendPixels}
+              backendPixels={player1Pixels}
             />
           )}
         </div>
         <div style={{ ...canvasStyles, marginRight: '50px', color: '#F00' }}>
           Player 2: {playerTwo ? playerTwo : 'Waiting For Player'}
+          {gameAreaController.isPlayerTwo && console.log('Drawing Player 2 Canvas')}
+          {gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {gameAreaController.isPlayerTwo && (
             <Canvas
               penColor='red'
               canPaint={gameAreaController.isPlayerTwo && status === 'GAME_STARTED'}
               tracePixels={traceShape ? traceShape.pixels : []}
-              sendPixels={setPlayer2FrontendPixels}
+              sendPixels={setPlayer2Pixels}
             />
           )}
+          {!gameAreaController.isPlayerTwo && console.log('Not Drawing Player 2 Canvas')}
+          {!gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {!gameAreaController.isPlayerTwo && (
             <Canvas
               penColor='purple'
               canPaint={false}
               tracePixels={traceShape ? traceShape.pixels : []}
-              backendPixels={player2BackendPixels}
+              backendPixels={player2Pixels}
             />
           )}
         </div>
