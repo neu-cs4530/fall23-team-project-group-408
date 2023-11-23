@@ -172,25 +172,20 @@ const Canvas = (props: CanvasProps) => {
     if (!canvas) {
       return;
     }
-    if (props.tracePixels && props.backendPixels) {
-      console.log('here');
+    if (props.backendPixels) {
       const context = canvas.getContext('2d');
       if (context) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = 'white'; // Set the fill style to red
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        for (const coordinate of props.tracePixels) {
-          context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
-        }
         context.fillStyle = props.penColor; // Set the fill style to red
         for (const coordinate of props.backendPixels) {
           context.fillRect(coordinate.x * scaleX, coordinate.y * scaleY, 1, 1);
         }
       }
     }
-  }, [props.tracePixels, props.backendPixels, props.penColor]);
+  }, [props.backendPixels, props.penColor]);
 
   return (
     <canvas

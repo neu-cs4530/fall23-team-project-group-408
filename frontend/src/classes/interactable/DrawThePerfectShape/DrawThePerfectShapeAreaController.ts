@@ -212,13 +212,19 @@ export default class DrawThePerfectShapeController extends GameAreaController<
         const newPlayerTwoCount = newState.state.player2_shape.pixels.length;
 
         if (!_.isEqual(this._playerOnePixelCount, newPlayerOneCount)) {
+          this.emit(
+            'playerOnePixelChanged',
+            newState.state.player1_shape.pixels.slice(this._playerOnePixelCount),
+          );
           this._playerOnePixelCount = newPlayerOneCount;
-          this.emit('playerOnePixelChanged', newState.state.player1_shape.pixels);
         }
 
         if (!_.isEqual(this._playerTwoPixelCount, newPlayerTwoCount)) {
+          this.emit(
+            'playerTwoPixelChanged',
+            newState.state.player2_shape.pixels.slice(this._playerTwoPixelCount),
+          );
           this._playerTwoPixelCount = newPlayerTwoCount;
-          this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
       }
     }
