@@ -19,9 +19,6 @@ import { useInteractable, useInteractableAreaController } from '../../../../clas
 import useTownController from '../../../../hooks/useTownController';
 import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
-import { use } from 'matter';
-import { set } from 'lodash';
-import { send } from 'process';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
@@ -35,9 +32,8 @@ function DrawThePerfectShapeArea({
   const [playerTwo, setPlayerTwo] = useState<string | undefined>(
     gameAreaController.playerTwo?.userName,
   );
-  const [status, setStatus] = useState<GameStatus>('WAITING_TO_START'); // ['Waiting For Players', 'Game In Progress', 'Game Over']
-  const [difficulty, setDifficulty] = useState<string>('Easy');
-  const [pressedStart, setPressedStart] = useState<boolean>(false); // has the start button been pressed
+  const [status, setStatus] = useState<GameStatus>(gameAreaController.status); // Initialize status to the current status of the game
+  const [difficulty, setDifficulty] = useState<string>(gameAreaController.difficulty);
   const [traceShape, setTraceShape] = useState<DrawThePerfectShapeShape | undefined>(
     gameAreaController.traceShape,
   ); // the shape to be traced
@@ -47,7 +43,6 @@ function DrawThePerfectShapeArea({
   const [player1Pixels, setPlayer1Pixels] = useState<DrawThePerfectShapePixel[]>(
     gameAreaController.playerOneShape?.pixels || [],
   );
-0
   const [player2Pixels, setPlayer2Pixels] = useState<DrawThePerfectShapePixel[]>(
     gameAreaController.playerTwoShape?.pixels || [],
   );
@@ -69,7 +64,6 @@ function DrawThePerfectShapeArea({
    */
   const handleStartGame = async () => {
     try {
-      setPressedStart(true);
       await gameAreaController.startGame();
     } catch (err) {
       console.log(err);
@@ -128,7 +122,7 @@ function DrawThePerfectShapeArea({
     return () => {
       gameAreaController.removeListener('playerTwoPixelChanged', setPlayer2Pixels);
     };
-  }, [gameAreaController, status, timer, pressedStart, player1Pixels]);
+  }, [gameAreaController, status, timer, player1Pixels]);
 
   useEffect(() => {
     gameAreaController.addListener('playerOnePixelChanged', setPlayer1Pixels);
@@ -146,7 +140,7 @@ function DrawThePerfectShapeArea({
     return () => {
       gameAreaController.removeListener('playerOnePixelChanged', setPlayer1Pixels);
     };
-  }, [gameAreaController, player2Pixels, status, timer, pressedStart]);
+  }, [gameAreaController, player2Pixels, status, timer]);
 
   const areaStyles: React.CSSProperties = { width: '100%', height: '600px' };
   const canvasRowStyles: React.CSSProperties = {
@@ -225,7 +219,7 @@ function DrawThePerfectShapeArea({
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: '50px' }}>
-        {gameAreaController.isPlayer && status === 'IN_PROGRESS' && !pressedStart && (
+        {gameAreaController.isPlayer && status === 'IN_PROGRESS' && (
           <select
             value={difficulty}
             onChange={event => {
@@ -274,7 +268,7 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
         <ModalContent>
           <ModalHeader>{gameArea.name}</ModalHeader>
           <ModalCloseButton />
-          <DrawThePerfectShapeArea interactableID={gameArea.name} />;
+          <DrawThePerfectShapeArea interactableID={gameArea.name} />
         </ModalContent>
       </Modal>
     );
