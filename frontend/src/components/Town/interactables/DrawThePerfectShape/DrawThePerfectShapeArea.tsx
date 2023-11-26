@@ -1,11 +1,4 @@
-import {
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-} from '@chakra-ui/react';
+import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/react';
 import {
   DrawThePerfectShapeDifficulty,
   DrawThePerfectShapePixel,
@@ -19,6 +12,7 @@ import { useInteractable, useInteractableAreaController } from '../../../../clas
 import useTownController from '../../../../hooks/useTownController';
 import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
+import DifficultyDropDown from './DifficultyDropDown';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
@@ -33,7 +27,9 @@ function DrawThePerfectShapeArea({
     gameAreaController.playerTwo?.userName,
   );
   const [status, setStatus] = useState<GameStatus>(gameAreaController.status); // Initialize status to the current status of the game
-  const [difficulty, setDifficulty] = useState<string>(gameAreaController.difficulty);
+  const [difficulty, setDifficulty] = useState<DrawThePerfectShapeDifficulty>(
+    gameAreaController.difficulty,
+  );
   const [traceShape, setTraceShape] = useState<DrawThePerfectShapeShape | undefined>(
     gameAreaController.traceShape,
   ); // the shape to be traced
@@ -73,10 +69,10 @@ function DrawThePerfectShapeArea({
   /**
    * Handles when a user presses the 'Change Difficulty' button
    */
-  const handleChangeDifficulty = async (newDifficulty: string) => {
+  const handleChangeDifficulty = async (newDifficulty: DrawThePerfectShapeDifficulty) => {
     setDifficulty(newDifficulty);
     try {
-      await gameAreaController.pickDifficulty(newDifficulty as DrawThePerfectShapeDifficulty);
+      await gameAreaController.pickDifficulty(newDifficulty);
     } catch (err) {
       console.log(err);
     }
@@ -218,17 +214,12 @@ function DrawThePerfectShapeArea({
           )}
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', marginTop: '50px' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginTop: '25px' }}>
         {gameAreaController.isPlayer && status === 'IN_PROGRESS' && (
-          <select
-            value={difficulty}
-            onChange={event => {
-              handleChangeDifficulty(event.target.value);
-            }}>
-            <option value='Easy'>Easy</option>
-            <option value='Medium'>Medium</option>
-            <option value='Hard'>Hard</option>
-          </select>
+          <DifficultyDropDown
+            difficulty={difficulty}
+            handleSelectDifficulty={handleChangeDifficulty}
+          />
         )}
         {status !== 'IN_PROGRESS' && status !== 'GAME_STARTED' && !gameAreaController.isPlayer && (
           <button
@@ -265,6 +256,8 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
     return (
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='5xl'>
         <ModalOverlay />
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore */}
         <ModalContent>
           <ModalHeader>{gameArea.name}</ModalHeader>
           <ModalCloseButton />
