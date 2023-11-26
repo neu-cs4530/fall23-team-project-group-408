@@ -19,7 +19,7 @@ export default class DrawThePerfectShapeGame extends Game<
     super({
       status: 'WAITING_TO_START',
       difficulty: 'Easy',
-      timer: 10,
+      timer: 20,
       last_time: 0,
       accuracy1: 0,
       accuracy2: 0,
@@ -108,12 +108,7 @@ export default class DrawThePerfectShapeGame extends Game<
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
   protected _leave(player: Player): void {
-    const findPlayer = this._players.find(eachPlayer => eachPlayer.id === player.id);
-    if (
-      this.state.player1 !== player.id &&
-      this.state.player2 !== player.id &&
-      findPlayer?.id !== player.id
-    ) {
+    if (this.state.player1 !== player.id && this.state.player2 !== player.id) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     // Handles case where the game has not started yet
@@ -123,7 +118,7 @@ export default class DrawThePerfectShapeGame extends Game<
         player1_shape: undefined,
         player2_shape: undefined,
         difficulty: 'Easy',
-        timer: 10,
+        timer: 20,
         last_time: 0,
         status: 'WAITING_TO_START',
         accuracy1: 0,
