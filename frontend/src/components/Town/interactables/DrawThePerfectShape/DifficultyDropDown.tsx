@@ -8,10 +8,9 @@ type DifficultyDropDownProps = {
   handleSelectDifficulty: (difficulty: DrawThePerfectShapeDifficulty) => void;
 };
 export default function DifficultyDropDown(props: DifficultyDropDownProps): JSX.Element {
-  const [buttonColor, setButtonColor] = useState('green');
   const style: React.CSSProperties = {
     width: 'auto',
-    background: buttonColor,
+    background: '#3CAEA3',
   };
 
   return (
@@ -23,21 +22,10 @@ export default function DifficultyDropDown(props: DifficultyDropDownProps): JSX.
         value={props.difficulty}
         onChange={event => {
           props.handleSelectDifficulty(event.target.value as DrawThePerfectShapeDifficulty);
-          setButtonColor(
-            event.target.value === 'Easy'
-              ? 'green'
-              : event.target.value === 'Medium'
-              ? 'yellow'
-              : 'red',
-          );
         }}>
         <option value='Easy'>Easy</option>
-        <option value='Medium' style={{ background: 'yellow' }}>
-          Medium
-        </option>
-        <option value='Hard' style={{ background: 'red' }}>
-          Hard
-        </option>
+        <option value='Medium'>Medium</option>
+        <option value='Hard'>Hard</option>
       </Select>
     </div>
   );
