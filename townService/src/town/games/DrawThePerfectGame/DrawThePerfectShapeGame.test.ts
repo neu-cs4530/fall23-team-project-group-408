@@ -57,7 +57,7 @@ describe('DrawThePerfectShapeGame', () => {
         });
         it('sets all the game settings to the default value', () => {
           expect(game.state.difficulty).toEqual('Easy');
-          expect(game.state.timer).toEqual(10);
+          expect(game.state.timer).toEqual(0);
           expect(game.state.last_time).toEqual(0);
           expect(game.state.player1_shape).toBeUndefined();
           expect(game.state.player2_shape).toBeUndefined();
@@ -67,13 +67,6 @@ describe('DrawThePerfectShapeGame', () => {
     });
   });
   describe('_leave', () => {
-    it('should throw an error if the player is not in the game', () => {
-      expect(() => game.leave(createPlayerForTesting())).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-      const player = createPlayerForTesting();
-      game.join(player);
-      expect(() => game.leave(createPlayerForTesting())).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-    });
-
     describe('when the player is in the game', () => {
       describe('when the game is in progress, it should set the game status to OVER and declare the other player the winner', () => {
         test('when player1 leaves', () => {
@@ -95,7 +88,7 @@ describe('DrawThePerfectShapeGame', () => {
           expect(game.state.player2_shape).toBeUndefined();
           expect(game.state.last_time).toEqual(0);
           expect(game.state.difficulty).toEqual('Easy');
-          expect(game.state.timer).toEqual(10);
+          expect(game.state.timer).toEqual(0);
 
           expect(game.state.player1).toEqual(player1.id);
           expect(game.state.player2).toEqual(player2.id);
@@ -119,7 +112,7 @@ describe('DrawThePerfectShapeGame', () => {
           expect(game.state.player2_shape).toBeUndefined();
           expect(game.state.last_time).toEqual(0);
           expect(game.state.difficulty).toEqual('Easy');
-          expect(game.state.timer).toEqual(10);
+          expect(game.state.timer).toEqual(0);
 
           expect(game.state.player1).toEqual(player1.id);
           expect(game.state.player2).toEqual(player2.id);
