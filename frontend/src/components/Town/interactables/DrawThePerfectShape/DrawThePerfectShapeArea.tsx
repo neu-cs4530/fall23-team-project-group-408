@@ -173,7 +173,7 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController, player2Pixels, status, timer]);
 
-  const areaStyles: React.CSSProperties = { width: '100%', height: '600px'};
+  const areaStyles: React.CSSProperties = { width: '100%', height: '600px' };
   const canvasRowStyles: React.CSSProperties = {
     width: '100%',
     height: 'fit-content',
