@@ -82,7 +82,7 @@ const Canvas = (props: CanvasProps) => {
               const g = canvasImageData.data[index + 1];
               const b = canvasImageData.data[index + 2];
               if ((r !== 255 || g !== 255 || b !== 255) && (r !== 0 || g !== 0 || b !== 0)) {
-                allPixels.push({ x: x / scaleX, y: y / scaleY });
+                allPixels.push({ x: Math.round(x / scaleX), y: Math.round(y / scaleY) });
               }
             }
           }
