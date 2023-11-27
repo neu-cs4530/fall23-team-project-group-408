@@ -1,4 +1,11 @@
-import { Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from '@chakra-ui/react';
+import {
+  Modal,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useToast,
+} from '@chakra-ui/react';
 import {
   DrawThePerfectShapeDifficulty,
   DrawThePerfectShapePixel,
@@ -20,6 +27,8 @@ function DrawThePerfectShapeArea({
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<DrawThePerfectShapeController>(interactableID);
+  const townController = useTownController();
+  const toast = useToast();
   const [playerOne, setPlayerOne] = useState<string | undefined>(
     gameAreaController.playerOne?.userName,
   );
@@ -85,7 +94,26 @@ function DrawThePerfectShapeArea({
       setStatus(gameAreaController.status);
     }
     function onGameEnd() {
-      console.log('game ended');
+      const winner = gameAreaController.winner;
+      if (!winner) {
+        toast({
+          title: 'Game over',
+          description: 'Game ended in a tie',
+          status: 'info',
+        });
+      } else if (winner === townController.ourPlayer) {
+        toast({
+          title: 'Game over',
+          description: 'You won!',
+          status: 'success',
+        });
+      } else {
+        toast({
+          title: 'Game over',
+          description: `You lost :(`,
+          status: 'error',
+        });
+      }
     }
 
     gameAreaController.addListener('gameUpdated', updateGameState);
@@ -100,7 +128,7 @@ function DrawThePerfectShapeArea({
       gameAreaController.removeListener('traceShapeChanged', setTraceShape);
       gameAreaController.removeListener('timerChanged', setTimer);
     };
-  }, [gameAreaController]);
+  }, [gameAreaController, toast, townController]);
 
   useEffect(() => {
     gameAreaController.addListener('playerTwoPixelChanged', setPlayer2Pixels);

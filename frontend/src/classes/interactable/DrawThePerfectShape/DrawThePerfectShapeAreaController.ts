@@ -30,9 +30,11 @@ export default class DrawThePerfectShapeController extends GameAreaController<
 
   protected _playerTwoPixelCount: integer = 0;
 
-  protected _timer = 10;
+  protected _timer = 20;
 
   protected _difficulty: DrawThePerfectShapeDifficulty = 'Easy';
+
+  protected _gameEnded = false;
 
   /**
    * Returns the Player One, if there is one, or undefined otherwise
@@ -146,7 +148,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
     if (this._model.game) {
       return this._model.game.state.timer;
     }
-    return 10;
+    return 20;
   }
 
   /**
@@ -220,6 +222,10 @@ export default class DrawThePerfectShapeController extends GameAreaController<
           this._playerTwoPixelCount = newPlayerTwoCount;
           this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
+      }
+      if (!this._gameEnded && newState.state.status === 'OVER') {
+        this._gameEnded = true;
+        this.emit('gameEnd');
       }
     }
   }
