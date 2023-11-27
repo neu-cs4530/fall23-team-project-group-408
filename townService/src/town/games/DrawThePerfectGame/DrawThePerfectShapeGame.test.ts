@@ -1,8 +1,6 @@
-import exp from 'constants';
 import { createPlayerForTesting } from '../../../TestUtils';
 import {
   PLAYER_ALREADY_IN_GAME_MESSAGE,
-  PLAYER_NOT_IN_GAME_MESSAGE,
   SHAPE_DOES_NOT_EXISTS,
 } from '../../../lib/InvalidParametersError';
 import DrawThePerfectShapeGame from './DrawThePerfectShapeGame';
