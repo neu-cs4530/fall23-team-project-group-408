@@ -246,20 +246,26 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
     if (difficulties.length > 0) {
       const randomShape = this._getRandomShape(difficulties);
       const traceShapePixels = this._getTraceShapePixels(randomShape);
-      const emptyShapePixels: DrawThePerfectShapePixel[] = [];
+      const emptyShapePixelsOne: DrawThePerfectShapePixel[] = [];
+      const emptyShapePixelsTwo: DrawThePerfectShapePixel[] = [];
       const traceDrawThePerfectShapeShape = new Shape(
         randomShape,
         gameDifficulty,
         traceShapePixels,
       );
-      const playerDrawThePerfectShapeShape = new Shape(
+      const playerDrawThePerfectShapeShapePlayerOne = new Shape(
         randomShape,
         gameDifficulty,
-        emptyShapePixels,
+        emptyShapePixelsOne,
+      );
+      const playerDrawThePerfectShapeShapePlayerTwo = new Shape(
+        randomShape,
+        gameDifficulty,
+        emptyShapePixelsTwo,
       );
       game.state.trace_shape = traceDrawThePerfectShapeShape;
-      game.state.player1_shape = playerDrawThePerfectShapeShape;
-      game.state.player2_shape = playerDrawThePerfectShapeShape;
+      game.state.player1_shape = playerDrawThePerfectShapeShapePlayerOne;
+      game.state.player2_shape = playerDrawThePerfectShapeShapePlayerTwo;
     }
   }
 

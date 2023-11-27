@@ -30,9 +30,11 @@ export default class DrawThePerfectShapeController extends GameAreaController<
 
   protected _playerTwoPixelCount: integer = 0;
 
-  protected _timer = 10;
+  protected _timer = 0;
 
   protected _difficulty: DrawThePerfectShapeDifficulty = 'Easy';
+
+  protected _gameEnded = false;
 
   /**
    * Returns the Player One, if there is one, or undefined otherwise
@@ -71,20 +73,20 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    * Returns the accuracy of player one, if the game is over, else throws an error
    */
   get playerOneAccuracy(): number {
-    if (this._model.game === undefined || this._model.game.state.status !== 'OVER') {
-      throw Error('Game has not ended yet');
+    if (this._model.game && this._gameEnded) {
+      return this._model.game.state.accuracy1;
     }
-    return this._model.game.state.accuracy1;
+    return 0;
   }
 
   /**
    * Returns the accuracy of player two, if the game is over, else throws an error
    */
   get playerTwoAccuracy(): number {
-    if (this._model.game === undefined || this._model.game.state.status !== 'OVER') {
-      throw Error('Game has not ended yet');
+    if (this._model.game && this._gameEnded) {
+      return this._model.game.state.accuracy2;
     }
-    return this._model.game.state.accuracy2;
+    return 0;
   }
 
   /**
@@ -146,7 +148,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
     if (this._model.game) {
       return this._model.game.state.timer;
     }
-    return 10;
+    return 20;
   }
 
   /**
@@ -221,6 +223,12 @@ export default class DrawThePerfectShapeController extends GameAreaController<
           this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
       }
+      if (!this._gameEnded && newState.state.status === 'OVER') {
+        this._gameEnded = true;
+        this.emit('gameEnd');
+        this.emit('player1Accuracy', this.playerOneAccuracy);
+        this.emit('player2Accuracy', this.playerTwoAccuracy);
+      }
     }
   }
 
@@ -270,6 +278,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    */
   public async startGame() {
     const instanceID = this._instanceID;
+    this._gameEnded = false;
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
