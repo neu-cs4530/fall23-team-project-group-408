@@ -68,7 +68,9 @@ function DrawThePerfectShapeArea({
 
   const [player1Accuracy, setPlayer1Accuracy] = useState(gameAreaController.playerOneAccuracy);
   const [player2Accuracy, setPlayer2Accuracy] = useState(gameAreaController.playerTwoAccuracy);
-  const [history, setHistory] = useState<CombinedGameResult[]>(gameAreaController.history);
+  const [history, setHistory] = useState<DrawThePerefectShapeGameResult[]>(
+    gameAreaController.history,
+  );
 
   /**
    * Handles when a user presses the 'Join Game' button
