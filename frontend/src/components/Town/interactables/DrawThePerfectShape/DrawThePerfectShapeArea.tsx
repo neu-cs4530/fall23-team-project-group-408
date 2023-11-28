@@ -115,25 +115,36 @@ function DrawThePerfectShapeArea({
       setStatus(gameAreaController.status);
       setObservers(gameAreaController.observers);
     }
+
     function onGameEnd() {
       const winner = gameAreaController.winner;
-      if (!winner) {
+      const playerOneAccuracyInfo = 'Player 1 accuracy: ' + Math.round(100 * player1Accuracy) + '%';
+      const playerTwoAccuracyInfo = 'Player 2 accuracy: ' + Math.round(100 * player2Accuracy) + '%';
+      if (winner === townController.ourPlayer) {
         toast({
           title: 'Game over',
-          description: 'Game ended in a tie',
-          status: 'info',
-        });
-      } else if (winner === townController.ourPlayer) {
-        toast({
-          title: 'Game over',
-          description: 'You won!',
+          description: 'You won!' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
           status: 'success',
         });
       } else {
         toast({
           title: 'Game over',
-          description: `You lost :(`,
+          description: 'You lost :(' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
           status: 'error',
+        });
+      }
+
+      if (!gameAreaController.isPlayer) {
+        toast({
+          title: 'Game over',
+          description:
+            winner?.userName +
+            ' has won' +
+            '\n' +
+            playerOneAccuracyInfo +
+            '\n' +
+            playerTwoAccuracyInfo,
+          status: 'info',
         });
       }
     }
@@ -142,19 +153,19 @@ function DrawThePerfectShapeArea({
     gameAreaController.addListener('difficultyChanged', setDifficulty);
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
-    gameAreaController.addListener('gameEnd', onGameEnd);
     gameAreaController.addListener('player1Accuracy', setPlayer1Accuracy);
     gameAreaController.addListener('player2Accuracy', setPlayer2Accuracy);
+    gameAreaController.addListener('gameEnd', onGameEnd);
     return () => {
       gameAreaController.removeListener('gameEnd', onGameEnd);
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('difficultyChanged', setDifficulty);
       gameAreaController.removeListener('traceShapeChanged', setTraceShape);
-      gameAreaController.removeListener('timerChanged', setTimer);
       gameAreaController.removeListener('player1Accuracy', setPlayer1Accuracy);
       gameAreaController.removeListener('player2Accuracy', setPlayer2Accuracy);
+      gameAreaController.removeListener('timerChanged', setTimer);
     };
-  }, [gameAreaController, toast, townController]);
+  }, [gameAreaController, toast, townController, player1Accuracy, player2Accuracy]);
 
   useEffect(() => {
     gameAreaController.addListener('playerTwoPixelChanged', setPlayer2Pixels);
@@ -288,8 +299,6 @@ function DrawThePerfectShapeArea({
       <div style={canvasRowStyles}>
         <div style={{ ...canvasStyles, marginLeft: '50px', color: '#20639B' }}>
           Player 1: {playerOne ? playerOne : 'Waiting For Player'}
-          {gameAreaController.isPlayerOne && console.log('Drawing Player 1 Canvas')}
-          {gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {gameAreaController.isPlayerOne && (
             <Canvas
               penColor='blue'
@@ -298,11 +307,9 @@ function DrawThePerfectShapeArea({
               sendPixels={setPlayer1Pixels}
             />
           )}
-          {!gameAreaController.isPlayerOne && console.log('Not Drawing Player 1 Canvas')}
-          {!gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {!gameAreaController.isPlayerOne && (
             <Canvas
-              penColor='green'
+              penColor='blue'
               canPaint={false}
               tracePixels={traceShape && status !== 'WAITING_TO_START' ? traceShape.pixels : []}
               backendPixels={player1Pixels}
@@ -323,14 +330,13 @@ function DrawThePerfectShapeArea({
               height: '100px',
               width: '100px',
               textAlign: 'center',
+              whiteSpace: 'nowrap',
             }}>
             {Math.max(Math.trunc(timer), 0)}
           </div>
         )}
         <div style={{ ...canvasStyles, marginRight: '50px', color: '#ED553B' }}>
           Player 2: {playerTwo ? playerTwo : 'Waiting For Player'}
-          {gameAreaController.isPlayerTwo && console.log('Drawing Player 2 Canvas')}
-          {gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {gameAreaController.isPlayerTwo && (
             <Canvas
               penColor='red'
@@ -339,11 +345,9 @@ function DrawThePerfectShapeArea({
               sendPixels={setPlayer2Pixels}
             />
           )}
-          {!gameAreaController.isPlayerTwo && console.log('Not Drawing Player 2 Canvas')}
-          {!gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {!gameAreaController.isPlayerTwo && (
             <Canvas
-              penColor='purple'
+              penColor='red'
               canPaint={false}
               tracePixels={traceShape && status !== 'WAITING_TO_START' ? traceShape.pixels : []}
               backendPixels={player2Pixels}
@@ -382,13 +386,22 @@ function DrawThePerfectShapeArea({
 export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   const gameArea = useInteractable<GameAreaInteractable>('gameArea');
   const townController = useTownController();
+  const toast = useToast();
   const closeModal = useCallback(() => {
     if (gameArea) {
       townController.interactEnd(gameArea);
       const controller = townController.getGameAreaController(gameArea);
-      controller.leaveGame();
+      try {
+        controller.leaveGame();
+      } catch (err) {
+        toast({
+          title: 'Player not in game',
+          description: 'Player is not in the current game',
+          status: 'info',
+        });
+      }
     }
-  }, [townController, gameArea]);
+  }, [townController, gameArea, toast]);
 
   if (gameArea && gameArea.getData('type') === 'DrawThePerfectShape') {
     return (

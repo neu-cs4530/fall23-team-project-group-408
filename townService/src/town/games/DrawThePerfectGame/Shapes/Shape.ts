@@ -42,16 +42,19 @@ export default class Shape implements DrawThePerfectShapeShape {
     if (this.title !== otherShape.title || this.difficulty !== otherShape.difficulty) {
       throw new Error('Cannot compare shapes with different titles and/or difficulties');
     }
+
     let commonPixelCount = 0;
     let notInThisShapeCount = 0;
     for (const pixel of otherShape.pixels) {
-      if (this.pixels.includes(pixel)) {
-        commonPixelCount += 1;
-      } else {
-        notInThisShapeCount += 1;
+      for (const pixel2 of this.pixels) {
+        if (pixel2.x === pixel.x && pixel2.y === pixel.y) {
+          commonPixelCount += 5;
+          break;
+        }
       }
+      notInThisShapeCount += 1;
     }
     const totalPixels = this.pixels.length;
-    return (commonPixelCount - notInThisShapeCount) / totalPixels;
+    return Math.min(Math.max((commonPixelCount - notInThisShapeCount) / totalPixels, 0), 100);
   }
 }
