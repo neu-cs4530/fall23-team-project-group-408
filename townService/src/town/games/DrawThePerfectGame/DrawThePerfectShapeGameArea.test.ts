@@ -182,6 +182,7 @@ describe('DrawThePerfectShapeGameArea', () => {
             expect(gameArea.history.length).toEqual(1);
             expect(gameArea.history[0]).toEqual({
               gameID: game.id,
+              difficulty: 'Easy',
               scores: {
                 [player1.userName]: 1,
                 [player2.userName]: 0,
@@ -203,6 +204,7 @@ describe('DrawThePerfectShapeGameArea', () => {
             expect(gameArea.history.length).toEqual(1);
             expect(gameArea.history[0]).toEqual({
               gameID: game.id,
+              difficulty: 'Easy',
               scores: {
                 [player1.userName]: 0,
                 [player2.userName]: 1,
@@ -224,6 +226,7 @@ describe('DrawThePerfectShapeGameArea', () => {
             expect(gameArea.history.length).toEqual(1);
             expect(gameArea.history[0]).toEqual({
               gameID: game.id,
+              difficulty: 'Easy',
               scores: {
                 [player1.userName]: 0,
                 [player2.userName]: 0,
@@ -294,6 +297,7 @@ describe('DrawThePerfectShapeGameArea', () => {
           expect(gameArea.history.length).toEqual(1);
           expect(gameArea.history[0]).toEqual({
             gameID: game.id,
+            difficulty: 'Easy',
             scores: {
               [player1.userName]: 1,
               [player2.userName]: 0,
