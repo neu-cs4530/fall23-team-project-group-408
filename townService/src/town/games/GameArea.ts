@@ -1,5 +1,6 @@
 import Player from '../../lib/Player';
 import {
+  CombinedGameResult,
   GameArea as GameAreaModel,
   GameResult,
   GameState,
@@ -17,7 +18,7 @@ export default abstract class GameArea<
 > extends InteractableArea {
   protected _game?: GameType;
 
-  protected _history: GameResult[] = [];
+  protected _history: CombinedGameResult[] = [];
 
   public get game(): GameType | undefined {
     return this._game;

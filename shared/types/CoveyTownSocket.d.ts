@@ -137,6 +137,8 @@ export interface DrawThePerefectShapeGameResult {
   accuracy: { [playerName: string]: number };
 }
 
+export type CombinedGameResult = GameResult | DrawThePerfectShapeGameResult;
+
 /**
  * Base type for an *instance* of a game. An instance of a game
  * consists of the present state of the game (which can change over time),

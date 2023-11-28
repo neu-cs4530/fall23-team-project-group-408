@@ -50,6 +50,10 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
               [p1Name]: updatedState.state.winner === player1 ? 1 : 0,
               [p2Name]: updatedState.state.winner === player2 ? 1 : 0,
             },
+            accuracy: {
+              [p1Name]: updatedState.state.accuracy1,
+              [p2Name]: updatedState.state.accuracy2,
+            },
           });
         }
       }
