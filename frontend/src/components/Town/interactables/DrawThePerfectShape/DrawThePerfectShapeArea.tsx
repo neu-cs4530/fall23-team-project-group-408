@@ -118,8 +118,6 @@ function DrawThePerfectShapeArea({
 
     function onGameEnd() {
       const winner = gameAreaController.winner;
-      setPlayer1Accuracy(gameAreaController.playerOneAccuracy);
-      setPlayer2Accuracy(gameAreaController.playerTwoAccuracy);
       const playerOneAccuracyInfo = 'Player 1 accuracy: ' + Math.round(100 * player1Accuracy) + '%';
       const playerTwoAccuracyInfo = 'Player 2 accuracy: ' + Math.round(100 * player2Accuracy) + '%';
       if (winner === townController.ourPlayer) {
@@ -155,12 +153,16 @@ function DrawThePerfectShapeArea({
     gameAreaController.addListener('difficultyChanged', setDifficulty);
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
+    gameAreaController.addListener('player1Accuracy', setPlayer1Accuracy);
+    gameAreaController.addListener('player2Accuracy', setPlayer2Accuracy);
     gameAreaController.addListener('gameEnd', onGameEnd);
     return () => {
       gameAreaController.removeListener('gameEnd', onGameEnd);
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('difficultyChanged', setDifficulty);
       gameAreaController.removeListener('traceShapeChanged', setTraceShape);
+      gameAreaController.removeListener('player1Accuracy', setPlayer1Accuracy);
+      gameAreaController.removeListener('player2Accuracy', setPlayer2Accuracy);
       gameAreaController.removeListener('timerChanged', setTimer);
     };
   }, [gameAreaController, toast, townController, player1Accuracy, player2Accuracy]);
