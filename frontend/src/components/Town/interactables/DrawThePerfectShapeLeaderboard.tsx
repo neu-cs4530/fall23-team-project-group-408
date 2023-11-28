@@ -5,6 +5,14 @@ import {
   DrawThePerfectShapeDifficulty,
 } from '../../../types/CoveyTownSocket';
 
+interface PlayerStats {
+  difficulty: DrawThePerfectShapeDifficulty;
+  player: string;
+  wins: number;
+  losses: number;
+  accuracy: number;
+}
+
 export default function DrawThePerfectShapeLeaderboard({
   results,
 }: {
@@ -15,74 +23,42 @@ export default function DrawThePerfectShapeLeaderboard({
 
   const winsLossesTiesByPlayer: Record<
     string,
-    {
-      difficulty: DrawThePerfectShapeDifficulty;
-      player: string;
-      wins: number;
-      losses: number;
-      accuracy: number;
-    }
+    Record<DrawThePerfectShapeDifficulty, PlayerStats>
   > = {};
 
   results.forEach(result => {
     const players = Object.keys(result.scores);
-    const p1 = players[0];
-    const p2 = players[1];
-    const winner =
-      result.scores[p1] > result.scores[p2]
-        ? p1
-        : result.scores[p2] > result.scores[p1]
-        ? p2
-        : undefined;
-    const loser =
-      result.scores[p1] < result.scores[p2]
-        ? p1
-        : result.scores[p2] < result.scores[p1]
-        ? p2
-        : undefined;
-    if (winner) {
-      winsLossesTiesByPlayer[winner] = {
-        difficulty: result.difficulty,
-        player: winner,
-        wins: (winsLossesTiesByPlayer[winner]?.wins || 0) + 1,
-        losses: winsLossesTiesByPlayer[winner]?.losses || 0,
-        accuracy: Math.max(
-          winsLossesTiesByPlayer[winner]?.accuracy ?? 0,
-          result.accuracy[winner] ?? 0,
-        ),
-      };
-    }
-    if (loser) {
-      winsLossesTiesByPlayer[loser] = {
-        difficulty: result.difficulty,
-        player: loser,
-        wins: winsLossesTiesByPlayer[loser]?.wins || 0,
-        losses: (winsLossesTiesByPlayer[loser]?.losses || 0) + 1,
-        accuracy: Math.max(
-          winsLossesTiesByPlayer[loser]?.accuracy ?? 0,
-          result.accuracy[loser] ?? 0,
-        ),
-      };
-    }
-    if (!winner && !loser) {
-      winsLossesTiesByPlayer[p1] = {
-        difficulty: result.difficulty,
-        player: p1,
-        wins: winsLossesTiesByPlayer[p1]?.wins || 0,
-        losses: winsLossesTiesByPlayer[p1]?.losses || 0,
-        accuracy: Math.max(winsLossesTiesByPlayer[p1]?.accuracy ?? 0, result.accuracy[p1] ?? 0),
-      };
-      winsLossesTiesByPlayer[p2] = {
-        difficulty: result.difficulty,
-        player: p2,
-        wins: winsLossesTiesByPlayer[p2]?.wins || 0,
-        losses: winsLossesTiesByPlayer[p2]?.losses || 0,
-        accuracy: Math.max(winsLossesTiesByPlayer[p2]?.accuracy ?? 0, result.accuracy[p2] ?? 0),
-      };
-    }
+
+    players.forEach(player => {
+      const winner =
+        result.scores[player] === Math.max(result.scores[players[0]], result.scores[players[1]]);
+      const loser =
+        result.scores[player] === Math.min(result.scores[players[0]], result.scores[players[1]]);
+
+      const playerStats = winsLossesTiesByPlayer[player] || {};
+
+      if (winner || loser) {
+        const existingAccuracy = playerStats[result.difficulty]?.accuracy || 0;
+        const newAccuracy = result.accuracy[player] || 0;
+        const maxAccuracy = Math.max(existingAccuracy, newAccuracy);
+
+        const newEntry: PlayerStats = {
+          difficulty: result.difficulty,
+          player,
+          wins: (playerStats[result.difficulty]?.wins || 0) + (winner ? 1 : 0),
+          losses: (playerStats[result.difficulty]?.losses || 0) + (loser ? 1 : 0),
+          accuracy: Math.round(maxAccuracy * 100 * 100) / 100,
+        };
+
+        playerStats[result.difficulty] = newEntry;
+        winsLossesTiesByPlayer[player] = playerStats;
+      }
+    });
   });
 
-  const rows = Object.keys(winsLossesTiesByPlayer).map(player => winsLossesTiesByPlayer[player]);
+  const rows = Object.keys(winsLossesTiesByPlayer)
+    .map(player => Object.values(winsLossesTiesByPlayer[player]))
+    .flat();
   rows.sort((a, b) => b.wins - a.wins);
 
   const filterByPlayers = rows.filter(record =>
@@ -122,7 +98,7 @@ export default function DrawThePerfectShapeLeaderboard({
         <Tbody>
           {filteredResults.map(record => {
             return (
-              <Tr key={record.player}>
+              <Tr key={`${record.player}_${record.difficulty}`}>
                 <Td>{record.difficulty}</Td>
                 <Td>{record.player}</Td>
                 <Td>{record.wins}</Td>
