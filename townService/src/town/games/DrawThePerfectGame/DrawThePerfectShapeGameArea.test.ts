@@ -186,6 +186,10 @@ describe('DrawThePerfectShapeGameArea', () => {
                 [player1.userName]: 1,
                 [player2.userName]: 0,
               },
+              accuracy: {
+                [player1.userName]: 0,
+                [player2.userName]: 0,
+              },
             });
             expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
           });
@@ -203,6 +207,10 @@ describe('DrawThePerfectShapeGameArea', () => {
                 [player1.userName]: 0,
                 [player2.userName]: 1,
               },
+              accuracy: {
+                [player1.userName]: 0,
+                [player2.userName]: 0,
+              },
             });
             expect(interactableUpdateSpy).toHaveBeenCalledTimes(1);
           });
@@ -217,6 +225,10 @@ describe('DrawThePerfectShapeGameArea', () => {
             expect(gameArea.history[0]).toEqual({
               gameID: game.id,
               scores: {
+                [player1.userName]: 0,
+                [player2.userName]: 0,
+              },
+              accuracy: {
                 [player1.userName]: 0,
                 [player2.userName]: 0,
               },
@@ -284,6 +296,10 @@ describe('DrawThePerfectShapeGameArea', () => {
             gameID: game.id,
             scores: {
               [player1.userName]: 1,
+              [player2.userName]: 0,
+            },
+            accuracy: {
+              [player1.userName]: 0,
               [player2.userName]: 0,
             },
           });
