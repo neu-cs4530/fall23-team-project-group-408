@@ -115,25 +115,38 @@ function DrawThePerfectShapeArea({
       setStatus(gameAreaController.status);
       setObservers(gameAreaController.observers);
     }
+
     function onGameEnd() {
       const winner = gameAreaController.winner;
-      if (!winner) {
+      setPlayer1Accuracy(gameAreaController.playerOneAccuracy);
+      setPlayer2Accuracy(gameAreaController.playerTwoAccuracy);
+      const playerOneAccuracyInfo = 'Player 1 accuracy: ' + Math.round(100 * player1Accuracy) + '%';
+      const playerTwoAccuracyInfo = 'Player 2 accuracy: ' + Math.round(100 * player2Accuracy) + '%';
+      if (winner === townController.ourPlayer) {
         toast({
           title: 'Game over',
-          description: 'Game ended in a tie',
-          status: 'info',
-        });
-      } else if (winner === townController.ourPlayer) {
-        toast({
-          title: 'Game over',
-          description: 'You won!',
+          description: 'You won!' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
           status: 'success',
         });
       } else {
         toast({
           title: 'Game over',
-          description: `You lost :(`,
+          description: 'You lost :(' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
           status: 'error',
+        });
+      }
+
+      if (!gameAreaController.isPlayer) {
+        toast({
+          title: 'Game over',
+          description:
+            winner?.userName +
+            ' has won' +
+            '\n' +
+            playerOneAccuracyInfo +
+            '\n' +
+            playerTwoAccuracyInfo,
+          status: 'info',
         });
       }
     }
@@ -143,18 +156,14 @@ function DrawThePerfectShapeArea({
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
     gameAreaController.addListener('gameEnd', onGameEnd);
-    gameAreaController.addListener('player1Accuracy', setPlayer1Accuracy);
-    gameAreaController.addListener('player2Accuracy', setPlayer2Accuracy);
     return () => {
       gameAreaController.removeListener('gameEnd', onGameEnd);
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('difficultyChanged', setDifficulty);
       gameAreaController.removeListener('traceShapeChanged', setTraceShape);
       gameAreaController.removeListener('timerChanged', setTimer);
-      gameAreaController.removeListener('player1Accuracy', setPlayer1Accuracy);
-      gameAreaController.removeListener('player2Accuracy', setPlayer2Accuracy);
     };
-  }, [gameAreaController, toast, townController]);
+  }, [gameAreaController, toast, townController, player1Accuracy, player2Accuracy]);
 
   useEffect(() => {
     gameAreaController.addListener('playerTwoPixelChanged', setPlayer2Pixels);
@@ -382,13 +391,22 @@ function DrawThePerfectShapeArea({
 export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   const gameArea = useInteractable<GameAreaInteractable>('gameArea');
   const townController = useTownController();
+  const toast = useToast();
   const closeModal = useCallback(() => {
     if (gameArea) {
       townController.interactEnd(gameArea);
       const controller = townController.getGameAreaController(gameArea);
-      controller.leaveGame();
+      try {
+        controller.leaveGame();
+      } catch (err) {
+        toast({
+          title: 'Player not in game',
+          description: 'Player is not in the current game',
+          status: 'info',
+        });
+      }
     }
-  }, [townController, gameArea]);
+  }, [townController, gameArea, toast]);
 
   if (gameArea && gameArea.getData('type') === 'DrawThePerfectShape') {
     return (
