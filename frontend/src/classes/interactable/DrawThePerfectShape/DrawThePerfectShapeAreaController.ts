@@ -191,7 +191,7 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    * If the timer has changed, emits a 'timerChanged' event with the new timer.
    * If the difficult has changedm emits a 'difficultyChanged' event with the new difficulty.
    */
-  protected async _updateFrom(newModel: GameArea<DrawThePerfectShapeGameState>): void {
+  protected async _updateFrom(newModel: GameArea<DrawThePerfectShapeGameState>): Promise<void> {
     super._updateFrom(newModel);
     function sleep(ms: number): Promise<void> {
       return new Promise(resolve => setTimeout(resolve, ms));
