@@ -90,7 +90,7 @@ export default function DrawThePerfectShapeLeaderboard({
   const filteredResults = filterByPlayers.filter(record => record.difficulty === selectDifficulty);
 
   return (
-    <div>
+    <div style={{ overflow: 'scroll' }}>
       <input
         type='text'
         placeholder='Search by Player Name'

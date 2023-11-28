@@ -191,8 +191,11 @@ export default class DrawThePerfectShapeController extends GameAreaController<
    * If the timer has changed, emits a 'timerChanged' event with the new timer.
    * If the difficult has changedm emits a 'difficultyChanged' event with the new difficulty.
    */
-  protected _updateFrom(newModel: GameArea<DrawThePerfectShapeGameState>): void {
+  protected async _updateFrom(newModel: GameArea<DrawThePerfectShapeGameState>): void {
     super._updateFrom(newModel);
+    function sleep(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
     const newState = newModel.game;
     if (newState) {
       const newTimer = newState.state.timer;
@@ -223,14 +226,15 @@ export default class DrawThePerfectShapeController extends GameAreaController<
           this.emit('playerTwoPixelChanged', newState.state.player2_shape.pixels);
         }
       }
-      if (!this._gameEnded && newState.state.status === 'OVER') {
+      if (newState.state.status === 'OVER') {
         this._gameEnded = true;
         this.emit('player1Accuracy', newState.state.accuracy1);
 
         console.log('player 1 accuracy', newState.state.accuracy1);
         this.emit('player2Accuracy', newState.state.accuracy2);
         console.log('player 2 accuracy', newState.state.accuracy2);
-        this.emit('gameEnd');
+        await sleep(1000);
+        this.emit('gameOver');
       }
     }
   }

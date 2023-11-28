@@ -15,6 +15,7 @@ import {
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
   CombinedGameResult,
   DrawThePerefectShapeGameResult,
@@ -120,7 +121,21 @@ function DrawThePerfectShapeArea({
       const winner = gameAreaController.winner;
       const playerOneAccuracyInfo = 'Player 1 accuracy: ' + Math.round(100 * player1Accuracy) + '%';
       const playerTwoAccuracyInfo = 'Player 2 accuracy: ' + Math.round(100 * player2Accuracy) + '%';
-      if (winner === townController.ourPlayer) {
+      console.log('InGAmeEnd');
+      if (!gameAreaController.isPlayer) {
+        console.log('OBSERVERS');
+        toast({
+          title: 'Game over',
+          description:
+            winner?.userName +
+            ' has won' +
+            '\n' +
+            playerOneAccuracyInfo +
+            '\n' +
+            playerTwoAccuracyInfo,
+          status: 'info',
+        });
+      } else if (winner?.id === townController.ourPlayer.id) {
         toast({
           title: 'Game over',
           description: 'You won!' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
@@ -133,37 +148,23 @@ function DrawThePerfectShapeArea({
           status: 'error',
         });
       }
-
-      if (!gameAreaController.isPlayer) {
-        toast({
-          title: 'Game over',
-          description:
-            winner?.userName +
-            ' has won' +
-            '\n' +
-            playerOneAccuracyInfo +
-            '\n' +
-            playerTwoAccuracyInfo,
-          status: 'info',
-        });
-      }
     }
 
     gameAreaController.addListener('gameUpdated', updateGameState);
     gameAreaController.addListener('difficultyChanged', setDifficulty);
     gameAreaController.addListener('traceShapeChanged', setTraceShape);
     gameAreaController.addListener('timerChanged', setTimer);
+    gameAreaController.addListener('gameOver', onGameEnd);
     gameAreaController.addListener('player1Accuracy', setPlayer1Accuracy);
     gameAreaController.addListener('player2Accuracy', setPlayer2Accuracy);
-    gameAreaController.addListener('gameEnd', onGameEnd);
     return () => {
-      gameAreaController.removeListener('gameEnd', onGameEnd);
+      gameAreaController.removeListener('gameOver', onGameEnd);
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('difficultyChanged', setDifficulty);
       gameAreaController.removeListener('traceShapeChanged', setTraceShape);
+      gameAreaController.removeListener('timerChanged', setTimer);
       gameAreaController.removeListener('player1Accuracy', setPlayer1Accuracy);
       gameAreaController.removeListener('player2Accuracy', setPlayer2Accuracy);
-      gameAreaController.removeListener('timerChanged', setTimer);
     };
   }, [gameAreaController, toast, townController, player1Accuracy, player2Accuracy]);
 
@@ -245,44 +246,15 @@ function DrawThePerfectShapeArea({
   };
 
   const observersArea = (
-    <Accordion>
-      <AccordionItem>
-        <Heading as='h3'>
-          <AccordionButton>
-            <Box as='span' flex='1' textAlign='left'>
-              Current Observers
-              <AccordionIcon />
-            </Box>
-          </AccordionButton>
-        </Heading>
-        <AccordionPanel>
-          <List aria-label='list of observers in the game'>
-            {observers.map(player => {
-              return <ListItem key={player.id}>{player.userName}</ListItem>;
-            })}
-          </List>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
+    <List aria-label='list of observers in the game'>
+      {observers.map(player => {
+        return <ListItem key={player.id}>{player.userName}</ListItem>;
+      })}
+    </List>
   );
 
-  const area = (
-    <div style={areaStyles}>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                Leaderboard
-                <AccordionIcon />
-              </Box>
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <DrawThePerfectShapeLeaderboard results={history} />
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+  const game = (
+    <>
       <div style={{ ...textStyles, marginLeft: '25px' }}>Game Status: {statusMessage()}</div>
       <div
         style={{
@@ -362,7 +334,8 @@ function DrawThePerfectShapeArea({
             handleSelectDifficulty={handleChangeDifficulty}
           />
         )}
-        {status !== 'IN_PROGRESS' && status !== 'GAME_STARTED' && !gameAreaController.isPlayer && (
+        {(status === 'OVER' ||
+          ('IN_PROGRESS' && status !== 'GAME_STARTED' && !gameAreaController.isPlayer)) && (
           <button
             style={{ ...buttonStyles, backgroundColor: '#3CAEA3', marginRight: '25px' }}
             onClick={async () => handleJoinGame()}>
@@ -377,7 +350,25 @@ function DrawThePerfectShapeArea({
           </button>
         )}
       </div>
-      <div>{observersArea}</div>
+    </>
+  );
+  const area = (
+    <div style={areaStyles}>
+      <Tabs>
+        <TabList>
+          <Tab>Game</Tab>
+          <Tab>Leaderboard</Tab>
+          <Tab>Observers</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>{game}</TabPanel>
+          <TabPanel>
+            <DrawThePerfectShapeLeaderboard results={history} />
+          </TabPanel>
+
+          <TabPanel>{observersArea}</TabPanel>
+        </TabPanels>
+      </Tabs>
     </div>
   );
   return area;
@@ -386,6 +377,7 @@ function DrawThePerfectShapeArea({
 export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   const gameArea = useInteractable<GameAreaInteractable>('gameArea');
   const townController = useTownController();
+  townController.pause();
   const toast = useToast();
   const closeModal = useCallback(() => {
     if (gameArea) {
@@ -393,6 +385,7 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
       const controller = townController.getGameAreaController(gameArea);
       try {
         controller.leaveGame();
+        townController.unPause();
       } catch (err) {
         toast({
           title: 'Player not in game',
