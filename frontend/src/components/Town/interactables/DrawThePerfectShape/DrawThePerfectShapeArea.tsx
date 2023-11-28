@@ -299,8 +299,6 @@ function DrawThePerfectShapeArea({
       <div style={canvasRowStyles}>
         <div style={{ ...canvasStyles, marginLeft: '50px', color: '#20639B' }}>
           Player 1: {playerOne ? playerOne : 'Waiting For Player'}
-          {gameAreaController.isPlayerOne && console.log('Drawing Player 1 Canvas')}
-          {gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {gameAreaController.isPlayerOne && (
             <Canvas
               penColor='blue'
@@ -309,11 +307,9 @@ function DrawThePerfectShapeArea({
               sendPixels={setPlayer1Pixels}
             />
           )}
-          {!gameAreaController.isPlayerOne && console.log('Not Drawing Player 1 Canvas')}
-          {!gameAreaController.isPlayerOne && console.log(player1Pixels)}
           {!gameAreaController.isPlayerOne && (
             <Canvas
-              penColor='green'
+              penColor='blue'
               canPaint={false}
               tracePixels={traceShape && status !== 'WAITING_TO_START' ? traceShape.pixels : []}
               backendPixels={player1Pixels}
@@ -334,14 +330,13 @@ function DrawThePerfectShapeArea({
               height: '100px',
               width: '100px',
               textAlign: 'center',
+              whiteSpace: 'nowrap',
             }}>
             {Math.max(Math.trunc(timer), 0)}
           </div>
         )}
         <div style={{ ...canvasStyles, marginRight: '50px', color: '#ED553B' }}>
           Player 2: {playerTwo ? playerTwo : 'Waiting For Player'}
-          {gameAreaController.isPlayerTwo && console.log('Drawing Player 2 Canvas')}
-          {gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {gameAreaController.isPlayerTwo && (
             <Canvas
               penColor='red'
@@ -350,11 +345,9 @@ function DrawThePerfectShapeArea({
               sendPixels={setPlayer2Pixels}
             />
           )}
-          {!gameAreaController.isPlayerTwo && console.log('Not Drawing Player 2 Canvas')}
-          {!gameAreaController.isPlayerTwo && console.log(player2Pixels)}
           {!gameAreaController.isPlayerTwo && (
             <Canvas
-              penColor='purple'
+              penColor='red'
               canPaint={false}
               tracePixels={traceShape && status !== 'WAITING_TO_START' ? traceShape.pixels : []}
               backendPixels={player2Pixels}
