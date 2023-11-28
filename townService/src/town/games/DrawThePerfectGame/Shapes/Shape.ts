@@ -56,7 +56,7 @@ export default class Shape implements DrawThePerfectShapeShape {
     for (const pixel of otherShape.pixels) {
       for (const pixel2 of this.pixels) {
         if (pixel2.x === pixel.x && pixel2.y === pixel.y) {
-          commonPixelCount += 3;
+          commonPixelCount += 5;
           break;
         }
       }
