@@ -46,6 +46,7 @@ export default class DrawThePerfectShapeGameArea extends GameArea<DrawThePerfect
             this._occupants.find(eachPlayer => eachPlayer.id === player2)?.userName || player2;
           this._history.push({
             gameID,
+            difficulty: updatedState.state.difficulty,
             scores: {
               [p1Name]: updatedState.state.winner === player1 ? 1 : 0,
               [p2Name]: updatedState.state.winner === player2 ? 1 : 0,
