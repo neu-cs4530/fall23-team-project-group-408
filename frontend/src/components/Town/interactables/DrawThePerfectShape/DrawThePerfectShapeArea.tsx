@@ -377,15 +377,14 @@ function DrawThePerfectShapeArea({
 export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   const gameArea = useInteractable<GameAreaInteractable>('gameArea');
   const townController = useTownController();
-  townController.pause();
   const toast = useToast();
   const closeModal = useCallback(() => {
     if (gameArea) {
       townController.interactEnd(gameArea);
       const controller = townController.getGameAreaController(gameArea);
+      townController.unPause();
       try {
         controller.leaveGame();
-        townController.unPause();
       } catch (err) {
         toast({
           title: 'Player not in game',
@@ -397,6 +396,7 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   }, [townController, gameArea, toast]);
 
   if (gameArea && gameArea.getData('type') === 'DrawThePerfectShape') {
+    townController.pause();
     return (
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='5xl'>
         <ModalOverlay />
