@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
+  CombinedGameResult,
   GameArea,
   GameInstanceID,
-  GameResult,
   GameState,
   InteractableID,
 } from '../../types/CoveyTownSocket';
@@ -44,7 +44,7 @@ export default abstract class GameAreaController<
       this._players = game.players.map(playerID => this._townController.getPlayer(playerID));
   }
 
-  get history(): GameResult[] {
+  get history(): CombinedGameResult[] {
     return this._model.history;
   }
 
