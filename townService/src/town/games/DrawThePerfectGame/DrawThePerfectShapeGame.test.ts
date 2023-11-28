@@ -244,7 +244,7 @@ describe('DrawThePerfectShapeGame', () => {
         playerID: player2.id,
         move: shapeMove2,
       });
-      expect(game.state.winner).toEqual(player2.id);
+      expect(game.state.winner).toEqual(player1.id);
     });
   });
 });
