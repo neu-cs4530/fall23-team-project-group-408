@@ -1,13 +1,4 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Heading,
-  List,
-  ListItem,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -29,7 +20,6 @@ import useTownController from '../../../../hooks/useTownController';
 import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
 import DifficultyDropDown from './DifficultyDropDown';
-import PlayerController from '../../../../classes/PlayerController';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
@@ -61,7 +51,6 @@ function DrawThePerfectShapeArea({
   const [player2Pixels, setPlayer2Pixels] = useState<DrawThePerfectShapePixel[]>(
     gameAreaController.playerTwoShape?.pixels || [],
   );
-  const [observers, setObservers] = useState<PlayerController[]>(gameAreaController.observers);
 
   const [player1Accuracy, setPlayer1Accuracy] = useState(gameAreaController.playerOneAccuracy);
   const [player2Accuracy, setPlayer2Accuracy] = useState(gameAreaController.playerTwoAccuracy);
@@ -106,7 +95,6 @@ function DrawThePerfectShapeArea({
       setPlayerOne(gameAreaController.playerOne?.userName);
       setPlayerTwo(gameAreaController.playerTwo?.userName);
       setStatus(gameAreaController.status);
-      setObservers(gameAreaController.observers);
     }
     function onGameEnd() {
       const winner = gameAreaController.winner;
@@ -226,28 +214,6 @@ function DrawThePerfectShapeArea({
     }
   };
 
-  const observersArea = (
-    <Accordion>
-      <AccordionItem>
-        <Heading as='h3'>
-          <AccordionButton>
-            <Box as='span' flex='1' textAlign='left'>
-              Current Observers
-              <AccordionIcon />
-            </Box>
-          </AccordionButton>
-        </Heading>
-        <AccordionPanel>
-          <List aria-label='list of observers in the game'>
-            {observers.map(player => {
-              return <ListItem key={player.id}>{player.userName}</ListItem>;
-            })}
-          </List>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
-  );
-
   const area = (
     <div style={areaStyles}>
       <div style={{ ...textStyles, marginLeft: '25px' }}>Game Status: {statusMessage()}</div>
@@ -351,7 +317,6 @@ function DrawThePerfectShapeArea({
           </button>
         )}
       </div>
-      <div>{observersArea}</div>
     </div>
   );
   return area;
