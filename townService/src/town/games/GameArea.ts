@@ -24,7 +24,7 @@ export default abstract class GameArea<
     return this._game;
   }
 
-  public get history(): GameResult[] {
+  public get history(): CombinedGameResult[] {
     return this._history;
   }
 

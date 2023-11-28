@@ -16,6 +16,8 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import {
+  CombinedGameResult,
+  DrawThePerefectShapeGameResult,
   DrawThePerfectShapeDifficulty,
   DrawThePerfectShapePixel,
   DrawThePerfectShapeShape,
@@ -30,6 +32,7 @@ import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
 import DifficultyDropDown from './DifficultyDropDown';
 import PlayerController from '../../../../classes/PlayerController';
+import DrawThePerfectShapeLeaderboard from '../DrawThePerfectShapeLeaderboard';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
@@ -65,6 +68,7 @@ function DrawThePerfectShapeArea({
 
   const [player1Accuracy, setPlayer1Accuracy] = useState(gameAreaController.playerOneAccuracy);
   const [player2Accuracy, setPlayer2Accuracy] = useState(gameAreaController.playerTwoAccuracy);
+  const [history, setHistory] = useState<CombinedGameResult[]>(gameAreaController.history);
 
   /**
    * Handles when a user presses the 'Join Game' button
@@ -103,6 +107,7 @@ function DrawThePerfectShapeArea({
 
   useEffect(() => {
     function updateGameState() {
+      setHistory(gameAreaController.history);
       setPlayerOne(gameAreaController.playerOne?.userName);
       setPlayerTwo(gameAreaController.playerTwo?.userName);
       setStatus(gameAreaController.status);
@@ -250,6 +255,21 @@ function DrawThePerfectShapeArea({
 
   const area = (
     <div style={areaStyles}>
+      <Accordion allowToggle>
+        <AccordionItem>
+          <Heading as='h3'>
+            <AccordionButton>
+              <Box as='span' flex='1' textAlign='left'>
+                Leaderboard
+                <AccordionIcon />
+              </Box>
+            </AccordionButton>
+          </Heading>
+          <AccordionPanel>
+            <DrawThePerfectShapeLeaderboard results={history} />
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
       <div style={{ ...textStyles, marginLeft: '25px' }}>Game Status: {statusMessage()}</div>
       <div
         style={{
