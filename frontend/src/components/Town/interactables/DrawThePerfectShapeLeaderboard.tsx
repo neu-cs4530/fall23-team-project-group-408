@@ -46,7 +46,10 @@ export default function DrawThePerfectShapeLeaderboard({
         player: winner,
         wins: (winsLossesTiesByPlayer[winner]?.wins || 0) + 1,
         losses: winsLossesTiesByPlayer[winner]?.losses || 0,
-        accuracy: Math.max(winsLossesTiesByPlayer[winner]?.accuracy, result.accuracy[winner]),
+        accuracy: Math.max(
+          winsLossesTiesByPlayer[winner]?.accuracy ?? 0,
+          result.accuracy[winner] ?? 0,
+        ),
       };
     }
     if (loser) {
@@ -55,7 +58,10 @@ export default function DrawThePerfectShapeLeaderboard({
         player: loser,
         wins: winsLossesTiesByPlayer[loser]?.wins || 0,
         losses: (winsLossesTiesByPlayer[loser]?.losses || 0) + 1,
-        accuracy: Math.max(winsLossesTiesByPlayer[loser]?.accuracy, result.accuracy[loser]),
+        accuracy: Math.max(
+          winsLossesTiesByPlayer[loser]?.accuracy ?? 0,
+          result.accuracy[loser] ?? 0,
+        ),
       };
     }
     if (!winner && !loser) {
@@ -64,14 +70,14 @@ export default function DrawThePerfectShapeLeaderboard({
         player: p1,
         wins: winsLossesTiesByPlayer[p1]?.wins || 0,
         losses: winsLossesTiesByPlayer[p1]?.losses || 0,
-        accuracy: Math.max(winsLossesTiesByPlayer[p1]?.accuracy, result.accuracy[p1]),
+        accuracy: Math.max(winsLossesTiesByPlayer[p1]?.accuracy ?? 0, result.accuracy[p1] ?? 0),
       };
       winsLossesTiesByPlayer[p2] = {
         difficulty: result.difficulty,
         player: p2,
         wins: winsLossesTiesByPlayer[p2]?.wins || 0,
         losses: winsLossesTiesByPlayer[p2]?.losses || 0,
-        accuracy: Math.max(winsLossesTiesByPlayer[p2]?.accuracy, result.accuracy[p2]),
+        accuracy: Math.max(winsLossesTiesByPlayer[p2]?.accuracy ?? 0, result.accuracy[p2] ?? 0),
       };
     }
   });
@@ -88,9 +94,8 @@ export default function DrawThePerfectShapeLeaderboard({
   };
 
   const filteredResults = filterByPlayers.filter(record => record.difficulty === selectDifficulty);
-
   return (
-    <div style={{ overflow: 'scroll' }}>
+    <div>
       <input
         type='text'
         placeholder='Search by Player Name'
