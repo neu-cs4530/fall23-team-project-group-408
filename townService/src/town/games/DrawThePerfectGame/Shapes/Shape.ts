@@ -55,6 +55,6 @@ export default class Shape implements DrawThePerfectShapeShape {
       notInThisShapeCount += 1;
     }
     const totalPixels = this.pixels.length;
-    return Math.min(Math.max((commonPixelCount - notInThisShapeCount) / totalPixels, 0), 100);
+    return Math.min(Math.max((commonPixelCount - notInThisShapeCount) / totalPixels, 0), 1);
   }
 }
