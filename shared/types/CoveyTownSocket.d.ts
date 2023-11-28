@@ -158,7 +158,7 @@ export interface GameInstance<T extends GameState> {
  */
 export interface GameArea<T extends GameState> extends Interactable {
   game: GameInstance<T> | undefined;
-  history: GameResult[];
+  history: CombinedGameResult[];
 }
 
 export type CommandID = string;
