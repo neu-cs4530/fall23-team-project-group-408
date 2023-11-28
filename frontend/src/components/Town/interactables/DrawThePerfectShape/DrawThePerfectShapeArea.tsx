@@ -204,7 +204,7 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController, player2Pixels, status, timer]);
 
-  const areaStyles: React.CSSProperties = { width: '100%', height: '600px' };
+  const areaStyles: React.CSSProperties = { width: '100%', height: '650px' };
   const canvasRowStyles: React.CSSProperties = {
     width: '100%',
     height: 'fit-content',
@@ -335,7 +335,9 @@ function DrawThePerfectShapeArea({
           />
         )}
         {(status === 'OVER' ||
-          ('IN_PROGRESS' && status !== 'GAME_STARTED' && !gameAreaController.isPlayer)) && (
+          (status !== 'IN_PROGRESS' &&
+            status !== 'GAME_STARTED' &&
+            !gameAreaController.isPlayer)) && (
           <button
             style={{ ...buttonStyles, backgroundColor: '#3CAEA3', marginRight: '25px' }}
             onClick={async () => handleJoinGame()}>
