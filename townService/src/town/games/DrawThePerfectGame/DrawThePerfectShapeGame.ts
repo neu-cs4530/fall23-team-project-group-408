@@ -43,13 +43,13 @@ export default class DrawThePerfectShapeGame extends Game<
     }
     this.state.timer -= currentTimeNow - this.state.last_time;
     this.state.last_time = currentTimeNow;
-    if (this.state.timer < 0) {
+    if (this.state.timer <= 0) {
       this.state.status = 'OVER';
       const player1Accuracy = this.state.trace_shape.accuracy(this.state.player1_shape);
       const player2Accuracy = this.state.trace_shape.accuracy(this.state.player2_shape);
       this.state.accuracy1 = player1Accuracy;
       this.state.accuracy2 = player2Accuracy;
-      if (player1Accuracy > player2Accuracy) {
+      if (player1Accuracy >= player2Accuracy) {
         this.state.winner = this.state.player1;
       } else {
         this.state.winner = this.state.player2;
@@ -108,9 +108,9 @@ export default class DrawThePerfectShapeGame extends Game<
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
   protected _leave(player: Player): void {
-    // if (this.state.player1 !== player.id && this.state.player2 !== player.id) {
-    //   throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    // }
+    if (this.state.player1 !== player.id && this.state.player2 !== player.id) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
     // Handles case where the game has not started yet
     if (this.state.player2 === undefined) {
       this.state = {

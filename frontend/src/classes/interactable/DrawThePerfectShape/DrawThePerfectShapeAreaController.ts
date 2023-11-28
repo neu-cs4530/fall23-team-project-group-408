@@ -226,8 +226,8 @@ export default class DrawThePerfectShapeController extends GameAreaController<
       if (!this._gameEnded && newState.state.status === 'OVER') {
         this._gameEnded = true;
         this.emit('gameEnd');
-        this.emit('player1Accuracy', this.playerOneAccuracy);
-        this.emit('player2Accuracy', this.playerTwoAccuracy);
+        this.emit('player1Accuracy', newState.state.accuracy1);
+        this.emit('player2Accuracy', newState.state.accuracy2);
       }
     }
   }
