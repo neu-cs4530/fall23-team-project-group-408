@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { Select } from '@chakra-ui/react';
 import { DrawThePerfectShapeDifficulty } from '../../../../../../shared/types/CoveyTownSocket';
-import { set } from 'lodash';
 
 type DifficultyDropDownProps = {
   difficulty: DrawThePerfectShapeDifficulty;
   handleSelectDifficulty: (difficulty: DrawThePerfectShapeDifficulty) => void;
 };
+
+/**
+ * Drop down menu for selecting difficulty
+ * @param props props for the difficulty drop down menu
+ * @returns a drop down menu for selecting difficulty
+ */
 export default function DifficultyDropDown(props: DifficultyDropDownProps): JSX.Element {
   const style: React.CSSProperties = {
     width: 'auto',
@@ -14,8 +19,6 @@ export default function DifficultyDropDown(props: DifficultyDropDownProps): JSX.
   };
 
   return (
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     <div style={{ width: 'auto' }}>
       <Select
         style={style}
