@@ -1,11 +1,4 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Heading,
   List,
   ListItem,
   Modal,
@@ -17,7 +10,6 @@ import {
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
-  CombinedGameResult,
   DrawThePerefectShapeGameResult,
   DrawThePerfectShapeDifficulty,
   DrawThePerfectShapePixel,
@@ -49,16 +41,14 @@ function DrawThePerfectShapeArea({
   const [playerTwo, setPlayerTwo] = useState<string | undefined>(
     gameAreaController.playerTwo?.userName,
   );
-  const [status, setStatus] = useState<GameStatus>(gameAreaController.status); // Initialize status to the current status of the game
+  const [status, setStatus] = useState<GameStatus>(gameAreaController.status);
   const [difficulty, setDifficulty] = useState<DrawThePerfectShapeDifficulty>(
     gameAreaController.difficulty,
   );
   const [traceShape, setTraceShape] = useState<DrawThePerfectShapeShape | undefined>(
     gameAreaController.traceShape,
-  ); // the shape to be traced
-
-  const [timer, setTimer] = useState<number>(gameAreaController.timer); // the timer for the game
-
+  );
+  const [timer, setTimer] = useState<number>(gameAreaController.timer);
   const [player1Pixels, setPlayer1Pixels] = useState<DrawThePerfectShapePixel[]>(
     gameAreaController.playerOneShape?.pixels || [],
   );
@@ -66,7 +56,6 @@ function DrawThePerfectShapeArea({
     gameAreaController.playerTwoShape?.pixels || [],
   );
   const [observers, setObservers] = useState<PlayerController[]>(gameAreaController.observers);
-
   const [player1Accuracy, setPlayer1Accuracy] = useState(gameAreaController.playerOneAccuracy);
   const [player2Accuracy, setPlayer2Accuracy] = useState(gameAreaController.playerTwoAccuracy);
   const [history, setHistory] = useState<DrawThePerefectShapeGameResult[]>(
@@ -111,7 +100,11 @@ function DrawThePerfectShapeArea({
     }
   };
 
+  /**
+   * Updates Game State whenever there is changes to the game
+   */
   useEffect(() => {
+    /** Updates the Game State */
     function updateGameState() {
       setHistory(gameAreaController.history);
       setPlayerOne(gameAreaController.playerOne?.userName);
@@ -120,6 +113,7 @@ function DrawThePerfectShapeArea({
       setObservers(gameAreaController.observers);
     }
 
+    /** Sets the Winner when the Game Ends */
     function onGameEnd() {
       setWinner(gameAreaController.winner);
     }
@@ -142,6 +136,9 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController, toast, townController, player1Accuracy, player2Accuracy]);
 
+  /**
+   * Handles the pixels being drawn by player 1 and display player 2's drawn pixels
+   */
   useEffect(() => {
     gameAreaController.addListener('playerTwoPixelChanged', setPlayer2Pixels);
     const sendPlayerOnePixels = async () => {
@@ -160,6 +157,9 @@ function DrawThePerfectShapeArea({
     };
   }, [gameAreaController, status, timer, player1Pixels]);
 
+  /**
+   * Handles the pixels being drawn by player 2 and display player a's drawn pixels
+   */
   useEffect(() => {
     gameAreaController.addListener('playerOnePixelChanged', setPlayer1Pixels);
     const sendPlayerTwoPixels = async () => {
@@ -206,6 +206,7 @@ function DrawThePerfectShapeArea({
     color: '#3CAEA3',
   };
 
+  /** Displays the Status Message */
   const statusMessage = () => {
     switch (status) {
       case 'WAITING_TO_START':
@@ -219,6 +220,7 @@ function DrawThePerfectShapeArea({
     }
   };
 
+  /** Displays which player has won */
   const playerWon = () => {
     if (!gameAreaController.isPlayer) {
       if (player1Accuracy > player2Accuracy) {
@@ -241,6 +243,7 @@ function DrawThePerfectShapeArea({
     </List>
   );
 
+  /** The Draw the Perfect Shape Game */
   const game = (
     <>
       <div style={{ ...textStyles, marginLeft: '25px' }}>Game Status: {statusMessage()}</div>
@@ -350,6 +353,7 @@ function DrawThePerfectShapeArea({
       </div>
     </>
   );
+  /** The Draw the Perfect Shape Area Game */
   const area = (
     <div style={areaStyles}>
       <Tabs>
@@ -372,6 +376,7 @@ function DrawThePerfectShapeArea({
   return area;
 }
 
+/** The Draw the Perfect Shape Area Wrapper that makes the area interactable */
 export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
   const gameArea = useInteractable<GameAreaInteractable>('gameArea');
   const townController = useTownController();
