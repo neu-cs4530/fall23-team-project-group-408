@@ -3,7 +3,7 @@ import { Table, Tbody, Td, Thead, Tr } from '@chakra-ui/react';
 import {
   DrawThePerefectShapeGameResult,
   DrawThePerfectShapeDifficulty,
-} from '../../../types/CoveyTownSocket';
+} from '../../../../types/CoveyTownSocket';
 
 interface PlayerStats {
   difficulty: DrawThePerfectShapeDifficulty;
@@ -13,6 +13,13 @@ interface PlayerStats {
   accuracy: number;
 }
 
+/**
+ * DrawThePerfecShapeLeaderboard returns a react component of the history of the game. It tracks the difficulty, who wins,
+ * loses, and the accuracy of each shape. This leaderboard displays that information in a table and orders the players
+ * by name.
+ * @param param0 takes in the results of the game so far.
+ * @returns A JSX.Element of a ordered table that contains information about the results.
+ */
 export default function DrawThePerfectShapeLeaderboard({
   results,
 }: {
@@ -40,14 +47,14 @@ export default function DrawThePerfectShapeLeaderboard({
       if (winner || loser) {
         const existingAccuracy = playerStats[result.difficulty]?.accuracy || 0;
         const newAccuracy = result.accuracy[player] || 0;
-        const maxAccuracy = Math.max(existingAccuracy, newAccuracy);
+        const maxAccuracy = Math.max(existingAccuracy / 100, newAccuracy);
 
         const newEntry: PlayerStats = {
           difficulty: result.difficulty,
           player,
           wins: (playerStats[result.difficulty]?.wins || 0) + (winner ? 1 : 0),
           losses: (playerStats[result.difficulty]?.losses || 0) + (loser ? 1 : 0),
-          accuracy: Math.round(maxAccuracy * 100 * 100) / 100,
+          accuracy: Math.round(maxAccuracy * 100),
         };
 
         playerStats[result.difficulty] = newEntry;

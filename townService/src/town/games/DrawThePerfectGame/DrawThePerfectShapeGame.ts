@@ -11,6 +11,10 @@ import InvalidParametersError, {
   SHAPE_DOES_NOT_EXISTS,
 } from '../../../lib/InvalidParametersError';
 
+/**
+ * The DrawThePerfectShapeGame class in the backend allows the player to join, leave, and apply a move to the canvas.
+ * It changes the game state accordingly to how many players are in the game and axxs the pixels to the player's shape.
+ */
 export default class DrawThePerfectShapeGame extends Game<
   DrawThePerfectShapeGameState,
   DrawThePerfectShapeMove
@@ -26,6 +30,11 @@ export default class DrawThePerfectShapeGame extends Game<
     });
   }
 
+  /**
+   * This applies the move to the player by adding the pixels that the player has drawn to the pixels for the
+   * shape. We then compare the pixels drawn to the actual pixels for the shape in another method in another class.
+   * @param move contains the pixels that the user draws.
+   */
   public applyMove(move: GameMove<DrawThePerfectShapeMove>): void {
     if (move.move.player === 1) {
       this.state.player1_shape?.addPixels(move.move.pixels);

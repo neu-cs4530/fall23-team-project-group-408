@@ -33,7 +33,7 @@ import Canvas from './Canvas';
 import DrawThePerfectShapeController from '../../../../classes/interactable/DrawThePerfectShape/DrawThePerfectShapeAreaController';
 import DifficultyDropDown from './DifficultyDropDown';
 import PlayerController from '../../../../classes/PlayerController';
-import DrawThePerfectShapeLeaderboard from '../DrawThePerfectShapeLeaderboard';
+import DrawThePerfectShapeLeaderboard from './DrawThePerfectShapeLeaderboard';
 function DrawThePerfectShapeArea({
   interactableID,
 }: {
