@@ -16,6 +16,11 @@ type Coordinate = {
   y: number;
 };
 
+/**
+ * Canvas for drawing the perfect shape
+ * @param props props for the canvas
+ * @returns a canvas for drawing the perfect shape
+ */
 const Canvas = (props: CanvasProps) => {
   const [isPainting, setIsPainting] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinate | undefined>(undefined);
@@ -39,6 +44,9 @@ const Canvas = (props: CanvasProps) => {
     return coord;
   };
 
+  /**
+   * Start painting the canvas
+   */
   const startPaint = useCallback((event: MouseEvent) => {
     const coordinates = getCoordinates(event);
     if (coordinates) {
@@ -47,6 +55,9 @@ const Canvas = (props: CanvasProps) => {
     }
   }, []);
 
+  /**
+   * Draw a line on the canvas
+   */
   const drawLine = useCallback(
     (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
       if (!canvasRef.current || !originalMousePosition || !newMousePosition) {
@@ -93,6 +104,9 @@ const Canvas = (props: CanvasProps) => {
     [props],
   );
 
+  /**
+   * Paint the canvas
+   */
   const paint = useCallback(
     (event: MouseEvent) => {
       if (isPainting) {
@@ -106,6 +120,9 @@ const Canvas = (props: CanvasProps) => {
     [drawLine, isPainting, mousePosition],
   );
 
+  /**
+   * Stop painting the canvas
+   */
   const exitPaint = useCallback(() => {
     setIsPainting(false);
   }, []);
@@ -140,7 +157,7 @@ const Canvas = (props: CanvasProps) => {
   }, [startPaint, paint, exitPaint, props.canPaint]);
 
   /**
-   * Draw the initial canvas with the trace shape as the background
+   * Draw the initial canvas with the trace shape as the background and the pixels
    */
   useEffect(() => {
     const canvas: HTMLCanvasElement | null = canvasRef.current;
