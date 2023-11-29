@@ -403,8 +403,6 @@ export default function DrawThePerfectShapeAreaWrapper(): JSX.Element {
     return (
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='5xl'>
         <ModalOverlay />
-        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-        {/* @ts-ignore */}
         <ModalContent>
           <ModalHeader>{gameArea.name}</ModalHeader>
           <ModalCloseButton />

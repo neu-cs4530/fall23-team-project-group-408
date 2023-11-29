@@ -1,4 +1,3 @@
-import { assert, trace } from 'console';
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_ID_MISSMATCH_MESSAGE,

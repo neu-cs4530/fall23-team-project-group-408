@@ -2,7 +2,6 @@ import Player from '../../lib/Player';
 import {
   CombinedGameResult,
   GameArea as GameAreaModel,
-  GameResult,
   GameState,
   InteractableType,
 } from '../../types/CoveyTownSocket';
