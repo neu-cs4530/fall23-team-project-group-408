@@ -231,7 +231,7 @@ function DrawThePerfectShapeArea({
     } else {
       return 'Player Lost :(';
     }
-  }
+  };
 
   const observersArea = (
     <List aria-label='list of observers in the game'>
