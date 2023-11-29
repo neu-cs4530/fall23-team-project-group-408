@@ -72,6 +72,7 @@ function DrawThePerfectShapeArea({
   const [history, setHistory] = useState<DrawThePerefectShapeGameResult[]>(
     gameAreaController.history,
   );
+  const [winner, setWinner] = useState<PlayerController | undefined>(gameAreaController.winner);
 
   /**
    * Handles when a user presses the 'Join Game' button
@@ -80,6 +81,7 @@ function DrawThePerfectShapeArea({
     try {
       await gameAreaController.joinGame();
       setTraceShape(gameAreaController.traceShape);
+      setWinner(undefined);
     } catch (err) {
       console.log('error');
     }
@@ -91,6 +93,7 @@ function DrawThePerfectShapeArea({
   const handleStartGame = async () => {
     try {
       await gameAreaController.startGame();
+      setWinner(undefined);
     } catch (err) {
       console.log(err);
     }
@@ -118,36 +121,7 @@ function DrawThePerfectShapeArea({
     }
 
     function onGameEnd() {
-      const winner = gameAreaController.winner;
-      const playerOneAccuracyInfo = 'Player 1 accuracy: ' + Math.round(100 * player1Accuracy) + '%';
-      const playerTwoAccuracyInfo = 'Player 2 accuracy: ' + Math.round(100 * player2Accuracy) + '%';
-      console.log('InGAmeEnd');
-      if (!gameAreaController.isPlayer) {
-        console.log('OBSERVERS');
-        toast({
-          title: 'Game over',
-          description:
-            winner?.userName +
-            ' has won' +
-            '\n' +
-            playerOneAccuracyInfo +
-            '\n' +
-            playerTwoAccuracyInfo,
-          status: 'info',
-        });
-      } else if (winner?.id === townController.ourPlayer.id) {
-        toast({
-          title: 'Game over',
-          description: 'You won!' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
-          status: 'success',
-        });
-      } else {
-        toast({
-          title: 'Game over',
-          description: 'You lost :(' + '\n' + playerOneAccuracyInfo + '\n' + playerTwoAccuracyInfo,
-          status: 'error',
-        });
-      }
+      setWinner(gameAreaController.winner);
     }
 
     gameAreaController.addListener('gameUpdated', updateGameState);
@@ -245,6 +219,20 @@ function DrawThePerfectShapeArea({
     }
   };
 
+  const playerWon = () => {
+    if (!gameAreaController.isPlayer) {
+      if (player1Accuracy > player2Accuracy) {
+        return 'Player 1 Won!';
+      } else {
+        return 'Player 2 Won!';
+      }
+    } else if (winner?.id === townController.ourPlayer.id) {
+      return 'Player Won!';
+    } else {
+      return 'Player Lost :(';
+    }
+  };
+
   const observersArea = (
     <List aria-label='list of observers in the game'>
       {observers.map(player => {
@@ -264,9 +252,11 @@ function DrawThePerfectShapeArea({
           fontSize: '20px',
           minHeight: '24px',
         }}>
-        {traceShape &&
-          status !== 'WAITING_TO_START' &&
-          'Shape: ' + gameAreaController.traceShape?.title}
+        {timer <= 0
+          ? winner && playerWon()
+          : traceShape &&
+            status !== 'WAITING_TO_START' &&
+            'Shape: ' + gameAreaController.traceShape?.title}
       </div>
       <div style={canvasRowStyles}>
         <div style={{ ...canvasStyles, marginLeft: '50px', color: '#20639B' }}>
@@ -287,6 +277,9 @@ function DrawThePerfectShapeArea({
               backendPixels={player1Pixels}
             />
           )}
+          <div style={{ marginTop: '10px' }}>
+            {timer <= 0 && 'Player 1 Accuracy: ' + Math.round(100 * player1Accuracy) + '%'}
+          </div>
         </div>
         {status !== 'WAITING_TO_START' && status !== 'IN_PROGRESS' && (
           <div
@@ -325,9 +318,12 @@ function DrawThePerfectShapeArea({
               backendPixels={player2Pixels}
             />
           )}
+          <div style={{ marginTop: '10px' }}>
+            {timer <= 0 && 'Player 2 Accuracy: ' + Math.round(100 * player2Accuracy) + '%'}
+          </div>
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', marginTop: '25px', marginLeft: '25px' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginTop: '10px', marginLeft: '25px' }}>
         {gameAreaController.isPlayer && status === 'IN_PROGRESS' && (
           <DifficultyDropDown
             difficulty={difficulty}
